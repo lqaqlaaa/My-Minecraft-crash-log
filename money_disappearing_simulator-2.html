@@ -13,7 +13,7 @@
 .results{display:flex;flex-direction:column;gap:16px}.summary{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:10px}.stat{background:#0d1629;border:1px solid var(--line);border-radius:14px;padding:14px}.stat small{display:block;color:var(--muted);font-size:11px;margin-bottom:7px}.stat strong{font-size:clamp(17px,3vw,25px);font-variant-numeric:tabular-nums}.stat.total strong{color:var(--green)}
 .result-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}.result-head h2{margin:0;font-size:17px}.count{font-size:12px;color:var(--muted)}.amounts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;max-height:320px;overflow:auto;padding-right:4px}.amount{background:#0d1629;border:1px solid #293753;border-radius:10px;padding:10px 8px;text-align:center;animation:pop .25s ease both}.amount small{display:block;color:#8292b1;font-size:10px;margin-bottom:4px}.amount b{font-size:14px;font-variant-numeric:tabular-nums}.amount:nth-child(5n){border-color:#594b37}.empty{color:var(--muted);text-align:center;padding:48px 12px;border:1px dashed #3b4966;border-radius:14px;grid-column:1/-1}
 @keyframes pop{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
-.collector{border:1px solid #614b3e;background:linear-gradient(145deg,#2a2030,#1c2033);border-radius:17px;padding:18px;display:none}.collector.show{display:block;animation:pop .35s ease}.collector-top{display:flex;align-items:center;justify-content:space-between;gap:10px}.collector h2{margin:0;font-size:16px}.live-total{font-size:clamp(28px,5vw,42px);font-weight:800;color:var(--gold);font-variant-numeric:tabular-nums;margin:13px 0 4px}.live-label{font-size:12px;color:#c5b5c7}.progress{height:9px;background:#49384b;border-radius:99px;overflow:hidden;margin:15px 0 8px}.bar{height:100%;width:0;background:linear-gradient(90deg,#ffc15c,#ff7188);border-radius:99px;transition:width .12s linear}.collect-status{display:flex;justify-content:space-between;color:#c5b5c7;font-size:12px}.current{margin-top:14px;background:#171a2b;border:1px solid #59435a;border-radius:11px;padding:12px;display:flex;justify-content:space-between;align-items:center}.current span{color:var(--muted);font-size:12px}.current strong{color:#ffcf85;font-size:18px;font-variant-numeric:tabular-nums}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}.foot{text-align:center;color:#71809e;font-size:11px;margin:20px 0 0}
+.collector{border:1px solid #614b3e;background:linear-gradient(145deg,#2a2030,#1c2033);border-radius:17px;padding:18px;margin-top:14px;display:none;scroll-margin-top:24px}.collector.show{display:block;animation:pop .35s ease}.collector-top{display:flex;align-items:center;justify-content:space-between;gap:10px}.collector h2{margin:0;font-size:16px}.live-total{font-size:clamp(28px,5vw,42px);font-weight:800;color:var(--gold);font-variant-numeric:tabular-nums;margin:13px 0 4px}.live-label{font-size:12px;color:#c5b5c7}.progress{height:9px;background:#49384b;border-radius:99px;overflow:hidden;margin:15px 0 8px}.bar{height:100%;width:0;background:linear-gradient(90deg,#ffc15c,#ff7188);border-radius:99px;transition:width .12s linear}.collect-status{display:flex;justify-content:space-between;color:#c5b5c7;font-size:12px}.current{margin-top:14px;background:#171a2b;border:1px solid #59435a;border-radius:11px;padding:12px;display:flex;justify-content:space-between;align-items:center}.current span{color:var(--muted);font-size:12px}.current strong{color:#ffcf85;font-size:18px;font-variant-numeric:tabular-nums}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}.foot{text-align:center;color:#71809e;font-size:11px;margin:20px 0 0}
 @media(max-width:760px){.layout{grid-template-columns:1fr}.summary{grid-template-columns:1fr 1fr}.stat.total{grid-column:1/-1}.amounts{grid-template-columns:repeat(3,minmax(0,1fr))}.panel{padding:18px}}
 @media(max-width:390px){.amounts{grid-template-columns:repeat(2,minmax(0,1fr))}.summary{gap:7px}.stat{padding:11px}}
 </style>
@@ -52,20 +52,19 @@
         <div class="result-head"><h2>🧾 随机金额明细</h2><span class="count" id="count">等待生成</span></div>
         <div class="amounts" id="amounts"><div class="empty">先输入总金额和份数，点击「随机拆分金额」</div></div>
         <button class="collect" id="showProcess" style="width:100%;margin-top:16px" disabled>🪙 展示所有小余额加起来的过程</button>
-      </section>
-      <button class="collect" id="showProcess" disabled>🪙 展示所有小余额加起来的过程</button>
-      <section class="collector" id="collector" aria-live="polite">
-        <div class="collector-top"><h2>🪙 正在把零碎余额一笔笔加起来</h2><span class="count" id="collectCount">0 / 0</span></div>
-        <div class="live-total" id="liveTotal">¥0.00</div>
-        <div class="live-label">已经累计的金额</div>
-        <div class="progress"><div class="bar" id="bar"></div></div>
-        <div class="collect-status"><span id="progressText">准备开始</span><span id="percent">0%</span></div>
-        <div class="current"><span id="currentLabel">等待第一笔小余额</span><strong id="currentAmount">+¥0.00</strong></div>
-        <div class="actions">
-          <button class="secondary" id="pause" disabled>⏸ 暂停</button>
-          <button class="secondary" id="skip" disabled>⏭ 直接汇总</button>
-          <button class="secondary" id="again" disabled>↻ 重新播放</button>
-        </div>
+        <section class="collector" id="collector" aria-live="polite">
+          <div class="collector-top"><h2>🪙 正在把零碎余额一笔笔加起来</h2><span class="count" id="collectCount">0 / 0</span></div>
+          <div class="live-total" id="liveTotal">¥0.00</div>
+          <div class="live-label">已经累计的金额</div>
+          <div class="progress"><div class="bar" id="bar"></div></div>
+          <div class="collect-status"><span id="progressText">准备开始</span><span id="percent">0%</span></div>
+          <div class="current"><span id="currentLabel">等待第一笔小余额</span><strong id="currentAmount">+¥0.00</strong></div>
+          <div class="actions">
+            <button class="secondary" id="pause" disabled>⏸ 暂停</button>
+            <button class="secondary" id="skip" disabled>⏭ 直接汇总</button>
+            <button class="secondary" id="again" disabled>↻ 重新播放</button>
+          </div>
+        </section>
       </section>
     </section>
   </main>
@@ -74,7 +73,7 @@
 <script>
 (() => {
   const $ = id => document.getElementById(id);
-  let values = [], timer = null, index = 0, running = false, paused = false, sum = 0;
+  let values = [], timer = null, startDelay = null, index = 0, running = false, paused = false, sum = 0;
   const money = cents => '¥' + (cents / 100).toLocaleString('zh-CN',{minimumFractionDigits:2,maximumFractionDigits:2});
   const randomInt = max => {
     if (max <= 0) return 0;
@@ -102,8 +101,8 @@
     $('max').textContent = money(Math.max(...values));
   }
   function resetCollector() {
-    clearInterval(timer); timer=null; index=0; sum=0; running=false; paused=false;
-    $('collector').classList.remove('show'); $('showProcess').disabled=true;
+    clearInterval(timer); clearTimeout(startDelay); timer=null; startDelay=null; index=0; sum=0; running=false; paused=false;
+    $('collector').classList.remove('show'); $('showProcess').disabled=true; $('showProcess').textContent='🪙 展示所有小余额加起来的过程';
     $('liveTotal').textContent=money(0); $('collectCount').textContent=`0 / ${values.length}`;
     $('bar').style.width='0%'; $('progressText').textContent='准备开始'; $('percent').textContent='0%';
     $('currentLabel').textContent='等待第一笔小余额'; $('currentAmount').textContent='+¥0.00';
@@ -133,7 +132,7 @@
     values.push(cents-prev);
     // 随机打乱份数顺序。
     for(let i=values.length-1;i>0;i--){const j=randomInt(i+1);[values[i],values[j]]=[values[j],values[i]];}
-    renderAmounts(); resetCollector(); $('showProcess').disabled=false; $('showProcess').textContent='🪙 展示所有小余额加起来的过程'; $('showProcess').disabled=false;
+    renderAmounts(); resetCollector(); $('showProcess').disabled=false;
   }
   function updateProgress() {
     $('liveTotal').textContent=money(sum);
@@ -147,6 +146,7 @@
     $('liveTotal').textContent=money(sum);$('currentLabel').textContent='🎉 汇总完成';$('currentAmount').textContent='+'+money(values[values.length-1]||0);
     updateProgress();running=false;paused=false;
     $('pause').disabled=true;$('skip').disabled=true;$('again').disabled=false;
+    $('showProcess').disabled=false;$('showProcess').textContent='↻ 再看一次累加过程';
   }
   function tick() {
     if(index>=values.length){finish();return;}
@@ -166,8 +166,20 @@
   $('total').addEventListener('input',()=>{$('showProcess').disabled=true;});
   $('parts').addEventListener('input',()=>{$('showProcess').disabled=true;});
   $('generate').addEventListener('click',generate);
-  $('showProcess').addEventListener('click',()=>{ $('collector').classList.add('show'); play(); });
-  $('showProcess').addEventListener('click',()=>{ index=0; sum=0; updateProgress(); $('currentLabel').textContent='开始汇总零碎余额'; $('currentAmount').textContent='+¥0.00'; play(); });
+  $('showProcess').addEventListener('click',()=>{
+    if(!values.length || running || paused || startDelay) return;
+    $('collector').classList.add('show');
+    $('showProcess').disabled=true;
+    $('collector').scrollIntoView({behavior:'smooth',block:'center'});
+    // 等待平滑滚动基本完成后才开始累加，确保玩家能看到从 0 到第一笔的完整开场。
+    startDelay=setTimeout(()=>{
+      startDelay=null;
+      index=0;sum=0;updateProgress();
+      $('currentLabel').textContent='开始汇总零碎余额';
+      $('currentAmount').textContent='+¥0.00';
+      play();
+    },500);
+  });
   $('pause').addEventListener('click',()=>{
     if(!running&&!paused)return;
     if(!paused){clearInterval(timer);timer=null;paused=true;running=false;$('pause').textContent='▶ 继续';}
