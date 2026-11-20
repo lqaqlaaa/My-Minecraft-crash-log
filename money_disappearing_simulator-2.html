@@ -87,58 +87,6 @@ body,.paper,.viewerMain,.modebtn,.btn,.stat,.chart,.rankgrid div,.process,.entry
 ::view-transition-old(root),::view-transition-new(root){animation:none!important}
 @media(max-width:700px){.mRecord{grid-template-columns:minmax(0,1fr) auto!important;gap:6px}.mRecord .recordPrice{grid-column:2;grid-row:1;min-width:112px}.mRecord .itemTools{grid-column:1/-1;justify-content:flex-start}.viewerMain .mRecord{grid-template-columns:minmax(0,1fr) auto!important}.viewerMain .recordPrice{min-width:120px}.recordPrice strong{font-size:12px}.recordPrice small{font-size:9px}.dashTools #resetLocal{font-size:8px;padding:0 5px}}
 
-/* 消费记录：中间显示优惠后金额，右侧上方显示原价/优惠/单价，下方显示操作 */
-#ledgerMain .mRecord{grid-template-columns:20px minmax(0,1fr) minmax(100px,auto) minmax(145px,auto)!important;align-items:stretch!important}
-#ledgerMain .mRecord>.recordInfo{grid-column:2!important;grid-row:1!important;align-self:center!important}
-#ledgerMain .mRecord>.netPriceCenter{grid-column:3!important;grid-row:1!important;display:flex!important;align-items:center!important;justify-content:center!important;min-width:0!important;text-align:center!important}
-#ledgerMain .mRecord .netPrice{font:700 15px Georgia,serif!important;color:var(--accent)!important;white-space:nowrap!important}
-#ledgerMain .mRecord>.recordRight{grid-column:4!important;grid-row:1!important;display:flex!important;flex-direction:column!important;align-items:flex-end!important;justify-content:space-between!important;gap:7px!important;min-width:0!important}
-#ledgerMain .mRecord .originalPriceLine{display:flex!important;align-items:baseline!important;justify-content:flex-end!important;flex-wrap:wrap!important;gap:5px!important;white-space:nowrap!important}
-#ledgerMain .mRecord .originalPrice{font-size:12px!important;color:var(--text-2)!important;text-decoration:line-through!important}
-#ledgerMain .mRecord .discountLink{font-size:10px!important;color:#299b58!important}
-#ledgerMain .mRecord .priceMeta{font-size:10px!important;white-space:nowrap!important}
-#ledgerMain .mRecord .itemTools{display:flex!important;align-self:flex-end!important;gap:8px!important;margin:0!important}
-#ledgerMain .mRecord .itemTools button{font-size:10px!important}
-#ledgerMain .manualGrid label{display:grid!important;grid-template-rows:auto 40px!important;align-items:stretch!important;gap:6px!important}
-#ledgerMain .manualGrid input,#ledgerMain .manualGrid .custom-select-trigger,#ledgerMain .manualGrid .dateTrigger{box-sizing:border-box!important;width:100%!important;height:40px!important;min-height:40px!important;max-height:40px!important;margin:0!important;align-self:stretch!important}
-#ledgerMain .manualGrid .dateTrigger{display:flex!important;vertical-align:top!important;line-height:1!important;padding:0 10px!important}
-#toolsMain .toolsGrid{grid-template-columns:repeat(2,minmax(0,1fr))!important;align-items:stretch!important}
-#toolsMain .toolsGrid>*{min-width:0!important}
-#toolsMain .toolsGrid .currentBookTool{grid-column:1!important;grid-row:1!important}
-#toolsMain .toolsGrid #newBook{grid-column:2!important;grid-row:1!important}
-#toolsMain .toolsGrid #renameBook{grid-column:1!important;grid-row:2!important}
-#toolsMain .toolsGrid #manageBooks{grid-column:2!important;grid-row:2!important}
-#toolsMain .toolsGrid #mJson{grid-column:1!important;grid-row:3!important}
-#toolsMain .toolsGrid #mCsv{grid-column:2!important;grid-row:3!important}
-#toolsMain .toolsGrid #mImport{grid-column:1!important;grid-row:4!important}
-#toolsMain .toolsGrid #manageCats{grid-column:2!important;grid-row:4!important}
-#toolsMain .toolsGrid #manageUnits{grid-column:1!important;grid-row:5!important}
-#toolsMain .toolsGrid #generateTestBill{grid-column:1!important;grid-row:6!important}
-#toolsMain .toolsGrid #resetLocal{grid-column:2!important;grid-row:6!important}
-#toolsMain .toolsGrid .btn{width:100%!important;min-height:40px!important;box-sizing:border-box!important}
-@media(max-width:700px){
- #ledgerMain .mRecord{grid-template-columns:18px minmax(0,1fr) minmax(78px,auto) minmax(125px,auto)!important;gap:5px!important;padding:8px 3px!important}
- #ledgerMain .mRecord>.recordRight{gap:6px!important}
- #ledgerMain .mRecord .originalPrice{font-size:10px!important}
- #ledgerMain .mRecord .priceMeta{font-size:9px!important}
- #ledgerMain .mRecord .itemTools{gap:5px!important}
- #ledgerMain .mRecord .itemTools button{font-size:9px!important}
- #ledgerMain .mRecord .netPrice{font-size:12px!important}
- #toolsMain .toolsGrid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}
- #toolsMain .toolsGrid .currentBookTool{grid-column:1!important;grid-row:1!important}
- #toolsMain .toolsGrid #newBook{grid-column:2!important;grid-row:1!important}
- #toolsMain .toolsGrid #generateTestBill{grid-column:1!important;grid-row:6!important}
- #toolsMain .toolsGrid #resetLocal{grid-column:2!important;grid-row:6!important}
-}
-@media(max-width:390px){
- #ledgerMain .mRecord{grid-template-columns:16px minmax(0,1fr) minmax(65px,auto) minmax(112px,auto)!important;gap:3px!important}
- #ledgerMain .mRecord .itemName{font-size:11px!important}
- #ledgerMain .mRecord .recordMeta{font-size:9px!important}
- #ledgerMain .mRecord .netPrice{font-size:11px!important}
- #ledgerMain .mRecord .originalPriceLine{gap:3px!important}
- #ledgerMain .mRecord .itemTools{gap:4px!important}
- #ledgerMain .mRecord .itemTools button{font-size:8px!important}
-}
 </style>
 <style>
 /* Compact entry actions and dedicated read-only bill viewer */
@@ -316,6 +264,59 @@ input,select,textarea,.btn,.modebtn,.custom-select-trigger,.custom-select-option
  #ledgerMain .mRecord>.itemDragHandle{width:17px!important;min-width:17px!important}
  #ledgerMain .mRecord .itemTools{flex-direction:row;align-items:center;gap:2px!important}
 }
+/* 消费记录：中间显示优惠后金额，右侧上方显示原价/优惠/单价，下方显示操作 */
+#ledgerMain .mRecord{grid-template-columns:20px minmax(0,1fr) minmax(100px,auto) minmax(145px,auto)!important;align-items:stretch!important}
+#ledgerMain .mRecord>.recordInfo{grid-column:2!important;grid-row:1!important;align-self:center!important}
+#ledgerMain .mRecord>.netPriceCenter{grid-column:3!important;grid-row:1!important;display:flex!important;align-items:center!important;justify-content:center!important;min-width:0!important;text-align:center!important}
+#ledgerMain .mRecord .netPrice{font:700 15px Georgia,serif!important;color:var(--accent)!important;white-space:nowrap!important}
+#ledgerMain .mRecord>.recordRight{grid-column:4!important;grid-row:1!important;display:flex!important;flex-direction:column!important;align-items:flex-end!important;justify-content:space-between!important;gap:7px!important;min-width:0!important}
+#ledgerMain .mRecord .originalPriceLine{display:flex!important;align-items:baseline!important;justify-content:flex-end!important;flex-wrap:wrap!important;gap:5px!important;white-space:nowrap!important}
+#ledgerMain .mRecord .originalPrice{font-size:12px!important;color:var(--text-2)!important;text-decoration:line-through!important}
+#ledgerMain .mRecord .discountLink{font-size:10px!important;color:#299b58!important}
+#ledgerMain .mRecord .priceMeta{font-size:10px!important;white-space:nowrap!important}
+#ledgerMain .mRecord .itemTools{display:flex!important;align-self:flex-end!important;gap:8px!important;margin:0!important}
+#ledgerMain .mRecord .itemTools button{font-size:10px!important}
+#ledgerMain .manualGrid label{display:grid!important;grid-template-rows:auto 40px!important;align-items:stretch!important;gap:6px!important}
+#ledgerMain .manualGrid input,#ledgerMain .manualGrid .custom-select-trigger,#ledgerMain .manualGrid .dateTrigger{box-sizing:border-box!important;width:100%!important;height:40px!important;min-height:40px!important;max-height:40px!important;margin:0!important;align-self:stretch!important}
+#ledgerMain .manualGrid .dateTrigger{display:flex!important;vertical-align:top!important;line-height:1!important;padding:0 10px!important}
+#toolsMain .toolsGrid{grid-template-columns:repeat(2,minmax(0,1fr))!important;align-items:stretch!important}
+#toolsMain .toolsGrid>*{min-width:0!important}
+#toolsMain .toolsGrid .currentBookTool{grid-column:1!important;grid-row:1!important}
+#toolsMain .toolsGrid #newBook{grid-column:2!important;grid-row:1!important}
+#toolsMain .toolsGrid #renameBook{grid-column:1!important;grid-row:2!important}
+#toolsMain .toolsGrid #manageBooks{grid-column:2!important;grid-row:2!important}
+#toolsMain .toolsGrid #mJson{grid-column:1!important;grid-row:3!important}
+#toolsMain .toolsGrid #mCsv{grid-column:2!important;grid-row:3!important}
+#toolsMain .toolsGrid #mImport{grid-column:1!important;grid-row:4!important}
+#toolsMain .toolsGrid #manageCats{grid-column:2!important;grid-row:4!important}
+#toolsMain .toolsGrid #manageUnits{grid-column:1!important;grid-row:5!important}
+#toolsMain .toolsGrid #generateTestBill{grid-column:1!important;grid-row:6!important}
+#toolsMain .toolsGrid #resetLocal{grid-column:2!important;grid-row:6!important}
+#toolsMain .toolsGrid .btn{width:100%!important;min-height:40px!important;box-sizing:border-box!important}
+@media(max-width:700px){
+ #ledgerMain .mRecord{grid-template-columns:18px minmax(0,1fr) minmax(78px,auto) minmax(125px,auto)!important;gap:5px!important;padding:8px 3px!important}
+ #ledgerMain .mRecord>.recordRight{gap:6px!important}
+ #ledgerMain .mRecord .originalPrice{font-size:10px!important}
+ #ledgerMain .mRecord .priceMeta{font-size:9px!important}
+ #ledgerMain .mRecord .itemTools{gap:5px!important}
+ #ledgerMain .mRecord .itemTools button{font-size:9px!important}
+ #ledgerMain .mRecord .netPrice{font-size:12px!important}
+ #toolsMain .toolsGrid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}
+ #toolsMain .toolsGrid .currentBookTool{grid-column:1!important;grid-row:1!important}
+ #toolsMain .toolsGrid #newBook{grid-column:2!important;grid-row:1!important}
+ #toolsMain .toolsGrid #generateTestBill{grid-column:1!important;grid-row:6!important}
+ #toolsMain .toolsGrid #resetLocal{grid-column:2!important;grid-row:6!important}
+}
+@media(max-width:390px){
+ #ledgerMain .mRecord{grid-template-columns:16px minmax(0,1fr) minmax(65px,auto) minmax(112px,auto)!important;gap:3px!important}
+ #ledgerMain .mRecord .itemName{font-size:11px!important}
+ #ledgerMain .mRecord .recordMeta{font-size:9px!important}
+ #ledgerMain .mRecord .netPrice{font-size:11px!important}
+ #ledgerMain .mRecord .originalPriceLine{gap:3px!important}
+ #ledgerMain .mRecord .itemTools{gap:4px!important}
+ #ledgerMain .mRecord .itemTools button{font-size:8px!important}
+}
+
 </style></head><body><div class="app">
 <header class="top"><nav class="modebar"><button class="modebtn active" id="ledgerTab">记账</button><button class="modebtn" id="viewerTab">账单展示</button><button class="modebtn" id="rankTab">排行</button><button class="modebtn" id="toolsTab">工具</button><button class="modebtn" id="themeToggle">☾ 夜间模式</button></nav></header>
 
