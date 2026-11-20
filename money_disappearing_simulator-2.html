@@ -1,283 +1,35 @@
 <!doctype html>
-<html lang="zh-CN">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#111827">
-<title>你的钱是如何快速消失的？</title>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#eee9df"><title>你的钱是如何快速消失的？</title>
 <style>
-:root{color-scheme:dark;--bg:#0b1020;--panel:#131b2e;--panel2:#1b2640;--line:#2b3855;--text:#f4f7ff;--muted:#9ba9c4;--green:#53e0a0;--red:#ff7188;--gold:#ffd166;--blue:#7da7ff}
-*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 15% 0%,#1c2b4b 0,transparent 42%),radial-gradient(ellipse at 90% 15%,#352044 0,transparent 35%),var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;padding:28px 16px 50px}
-.wrap{width:min(980px,100%);margin:auto}.hero{text-align:center;margin:10px 0 28px}.eyebrow{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border:1px solid #59465d;background:#291e35;border-radius:99px;color:#ffc5d0;font-size:12px;letter-spacing:.08em}.hero h1{font-size:clamp(30px,6vw,54px);line-height:1.12;margin:16px 0 10px;letter-spacing:-.04em}.hero h1 span{color:var(--gold)}.hero p{color:var(--muted);margin:0;font-size:15px}
-.layout{display:grid;grid-template-columns:330px 1fr;gap:18px;align-items:start}.panel{background:linear-gradient(160deg,rgba(25,36,60,.97),rgba(17,25,43,.97));border:1px solid var(--line);border-radius:20px;padding:22px;box-shadow:0 18px 55px #0003}.panel h2{font-size:17px;margin:0 0 18px}.field{margin:15px 0}.field label{display:block;color:var(--muted);font-size:13px;margin-bottom:8px}.input-wrap{display:flex;align-items:center;background:#0c1426;border:1px solid #354361;border-radius:12px;padding:0 13px}.input-wrap b{font-size:20px;color:var(--muted)}input{width:100%;min-width:0;background:transparent;border:0;outline:0;color:var(--text);font-size:22px;padding:13px 9px;font-weight:650}input:focus-visible{outline:2px solid var(--blue);outline-offset:3px;border-radius:6px}.hint{font-size:11px;color:var(--muted);margin-top:7px}button{font:inherit;cursor:pointer;border:0;border-radius:12px;padding:12px 15px;font-weight:700;transition:transform .15s,filter .15s}button:hover{filter:brightness(1.1);transform:translateY(-1px)}button:active{transform:translateY(0)}button:disabled{opacity:.45;cursor:not-allowed;transform:none}.primary{width:100%;background:linear-gradient(100deg,#6f8fff,#9c79ff);color:white;margin-top:9px}.secondary{background:#24334f;color:#e5edff;border:1px solid #3c4c6d}.collect{background:linear-gradient(100deg,#ed9b42,#e65c7b);color:#241323}.error{color:var(--red);font-size:12px;min-height:18px;margin-top:8px}
-.results{display:flex;flex-direction:column;gap:16px}.summary{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:10px}.stat{background:#0d1629;border:1px solid var(--line);border-radius:14px;padding:14px}.stat small{display:block;color:var(--muted);font-size:11px;margin-bottom:7px}.stat strong{font-size:clamp(17px,3vw,25px);font-variant-numeric:tabular-nums}.stat.total strong{color:var(--green)}
-.result-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}.result-head h2{margin:0;font-size:17px}.count{font-size:12px;color:var(--muted)}.amounts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;max-height:320px;overflow:auto;padding-right:4px}.amount{background:#0d1629;border:1px solid #293753;border-radius:10px;padding:10px 8px;text-align:center;animation:pop .25s ease both}.amount small{display:block;color:#8292b1;font-size:10px;margin-bottom:4px}.amount b{font-size:14px;font-variant-numeric:tabular-nums}.amount:nth-child(5n){border-color:#594b37}.empty{color:var(--muted);text-align:center;padding:48px 12px;border:1px dashed #3b4966;border-radius:14px;grid-column:1/-1}
-@keyframes pop{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
-.collector{border:1px solid #614b3e;background:linear-gradient(145deg,#2a2030,#1c2033);border-radius:17px;padding:18px;margin-top:14px;display:none;scroll-margin-top:24px}.collector.show{display:block;animation:pop .35s ease}.collector-top{display:flex;align-items:center;justify-content:space-between;gap:10px}.collector h2{margin:0;font-size:16px}.live-total{font-size:clamp(28px,5vw,42px);font-weight:800;color:var(--gold);font-variant-numeric:tabular-nums;margin:13px 0 4px}.live-label{font-size:12px;color:#c5b5c7}.progress{height:9px;background:#49384b;border-radius:99px;overflow:hidden;margin:15px 0 8px}.bar{height:100%;width:0;background:linear-gradient(90deg,#ffc15c,#ff7188);border-radius:99px;transition:width .12s linear}.collect-status{display:flex;justify-content:space-between;color:#c5b5c7;font-size:12px}.current{margin-top:14px;background:#171a2b;border:1px solid #59435a;border-radius:11px;padding:12px;display:flex;justify-content:space-between;align-items:center}.current span{color:var(--muted);font-size:12px}.current strong{color:#ffcf85;font-size:18px;font-variant-numeric:tabular-nums}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}.foot{text-align:center;color:#71809e;font-size:11px;margin:20px 0 0}
-@media(max-width:760px){.layout{grid-template-columns:1fr}.summary{grid-template-columns:1fr 1fr}.stat.total{grid-column:1/-1}.amounts{grid-template-columns:repeat(3,minmax(0,1fr))}.panel{padding:18px}}
-@media(max-width:390px){.amounts{grid-template-columns:repeat(2,minmax(0,1fr))}.summary{gap:7px}.stat{padding:11px}}
-
-/* 紧凑自适应布局：优先让主要内容留在一个视口内 */
-html,body{height:100%;height:100dvh}
-body{overflow:hidden;padding:12px 14px 14px}
-.wrap{height:100%;max-width:1180px;display:flex;flex-direction:column;min-height:0}
-.hero{flex:0 0 auto;margin:0 0 12px}
-.eyebrow{padding:4px 9px;font-size:10px}
-.hero h1{font-size:clamp(24px,3.3vw,38px);margin:7px 0 4px}
-.hero p{font-size:12px}
-.layout{flex:1;min-height:0;grid-template-columns:minmax(250px,300px) minmax(0,1fr);gap:12px;align-items:stretch}
-.panel{padding:15px;border-radius:15px;box-shadow:0 8px 24px #0002}
-.panel h2{font-size:15px;margin-bottom:10px}
-.field{margin:9px 0}
-.field label{font-size:11px;margin-bottom:5px}
-input{font-size:18px;padding:9px 7px}
-.input-wrap b{font-size:17px}
-.hint{font-size:10px;margin-top:4px}
-button{padding:9px 11px;border-radius:10px;font-size:12px}
-.primary{margin-top:5px}
-.results{min-height:0;gap:10px}
-.results>.panel:first-child{flex:0 0 auto}
-.results>.panel:nth-child(2){flex:1;min-height:0;display:flex;flex-direction:column}
-.summary{gap:8px}
-.stat{padding:9px 11px}
-.stat small{font-size:10px;margin-bottom:3px}
-.stat strong{font-size:clamp(16px,2vw,22px)}
-.result-head{margin-bottom:8px}
-.result-head h2{font-size:15px}
-.amounts{flex:1;min-height:0;max-height:none;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));gap:5px;padding-right:3px}
-.amount{padding:6px 5px;border-radius:8px}
-.amount small{font-size:9px;margin-bottom:2px}
-.amount b{font-size:12px}
-.empty{padding:24px 10px;font-size:12px}
-#showProcess{flex:0 0 auto;margin-top:8px!important;padding:8px 10px}
-.collector{flex:0 0 auto;max-height:38%;overflow:auto;padding:12px;margin-top:8px}
-.collector h2{font-size:13px}
-.live-total{font-size:clamp(23px,3vw,32px);margin:7px 0 2px}
-.progress{margin:8px 0 5px;height:7px}
-.current{margin-top:8px;padding:8px}
-.current strong{font-size:15px}
-.actions{margin-top:8px;gap:6px}
-.actions button{padding:7px 9px}
-.foot{flex:0 0 auto;margin:7px 0 0;font-size:9px}
-@media(max-width:700px){
-  body{padding:8px}
-  .hero{margin-bottom:7px}
-  .hero h1{font-size:clamp(21px,6vw,29px);margin:5px 0 2px}
-  .hero p{font-size:10px}
-  .layout{grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);gap:7px}
-  .layout>.panel{padding:10px 12px}
-  .layout>.panel h2{margin-bottom:6px}
-  .layout>.panel .field{display:inline-block;vertical-align:top;width:calc(50% - 5px);margin:3px 4px 5px 0}
-  .layout>.panel .field:nth-of-type(2){margin-right:0}
-  .layout>.panel .input-wrap{padding:0 7px}
-  .layout>.panel input{font-size:16px;padding:7px 5px}
-  .layout>.panel .hint{display:none}
-  .layout>.panel .primary{width:100%;margin-top:2px;padding:8px}
-  .results{gap:6px}
-  .results>.panel:first-child{padding:7px}
-  .summary{grid-template-columns:1.2fr 1fr 1fr;gap:5px}
-  .stat{padding:6px 7px}
-  .stat.total{grid-column:auto}
-  .stat small{font-size:9px}
-  .stat strong{font-size:clamp(13px,4vw,18px)}
-  .results>.panel:nth-child(2){padding:9px;overflow:hidden}
-  .result-head{margin-bottom:5px}
-  .result-head h2{font-size:13px}
-  .count{font-size:10px}
-  .amounts{grid-template-columns:repeat(auto-fill,minmax(65px,1fr));gap:4px}
-  .amount{padding:5px 3px}
-  .amount b{font-size:11px}
-  #showProcess{font-size:11px;margin-top:6px!important;padding:7px}
-  .collector{max-height:42%;padding:9px}
-  .collector-top h2{font-size:12px}
-  .live-total{font-size:24px}
-  .current{margin-top:6px;padding:6px}
-  .current strong{font-size:13px}
-  .actions button{font-size:10px;padding:6px 7px}
-  .foot{font-size:8px;margin-top:4px}
-}
-@media(max-height:650px){
-  body{padding-top:6px;padding-bottom:6px}
-  .hero{margin-bottom:5px}
-  .hero h1{font-size:24px;margin:3px 0}
-  .hero p{display:none}
-  .layout>.panel{padding:9px}
-  .field{margin:6px 0}
-  .foot{display:none}
-}
-
-</style>
-</head>
-<body>
-<div class="wrap">
-  <header class="hero">
-    <div class="eyebrow">💸 零碎金额累积实验</div>
-    <h1>你的钱是如何<span>快速消失</span>的？</h1>
-    <p>每一笔看起来都不多，全部加起来却可能很惊人。</p>
-  </header>
-  <main class="layout">
-    <section class="panel">
-      <h2>⚙️ 设置金额</h2>
-      <div class="field">
-        <label for="total">总金额（元）</label>
-        <div class="input-wrap"><b>¥</b><input id="total" type="number" min="0.01" step="0.01" placeholder="例如：1000.00" inputmode="decimal"></div>
-      </div>
-      <div class="field">
-        <label for="parts">随机分成多少份</label>
-        <div class="input-wrap"><input id="parts" type="number" min="1" max="10000" step="1" placeholder="例如：100" inputmode="numeric"><b style="font-size:13px">份</b></div>
-        <div class="hint">每份金额随机生成，最低 ¥0.01；总份数不能超过总金额的分数。</div>
-      </div>
-      <button class="primary" id="generate">🎲 随机拆分金额</button>
-      <div class="error" id="error" role="alert"></div>
-    </section>
-    <section class="results">
-      <section class="panel">
-        <div class="summary">
-          <div class="stat total"><small>所有小余额合计</small><strong id="sum">¥0.00</strong></div>
-          <div class="stat"><small>最小一笔</small><strong id="min">—</strong></div>
-          <div class="stat"><small>最大一笔</small><strong id="max">—</strong></div>
-        </div>
-      </section>
-      <section class="panel">
-        <div class="result-head"><h2>🧾 随机金额明细</h2><span class="count" id="count">等待生成</span></div>
-        <div class="amounts" id="amounts"><div class="empty">先输入总金额和份数，点击「随机拆分金额」</div></div>
-        <button class="collect" id="showProcess" style="width:100%;margin-top:16px" disabled>🪙 展示所有小余额加起来的过程</button>
-        <section class="collector" id="collector" aria-live="polite">
-          <div class="collector-top"><h2>🪙 正在把零碎余额一笔笔加起来</h2><span class="count" id="collectCount">0 / 0</span></div>
-          <div class="live-total" id="liveTotal">¥0.00</div>
-          <div class="live-label">已经累计的金额</div>
-          <div class="progress"><div class="bar" id="bar"></div></div>
-          <div class="collect-status"><span id="progressText">准备开始</span><span id="percent">0%</span></div>
-          <div class="current"><span id="currentLabel">等待第一笔小余额</span><strong id="currentAmount">+¥0.00</strong></div>
-          <div class="actions">
-            <button class="secondary" id="pause" disabled>⏸ 暂停</button>
-            <button class="secondary" id="skip" disabled>⏭ 直接汇总</button>
-            <button class="secondary" id="again" disabled>↻ 重新播放</button>
-          </div>
-        </section>
-      </section>
-    </section>
-  </main>
-  <p class="foot">金额以“分”为单位进行整数运算 · 每份不少于 ¥0.01 · 汇总结果与输入总金额精确一致</p>
-</div>
+:root{--paper:#fffdf8;--ink:#26251f;--muted:#858176;--line:#e8e2d7;--red:#bd5547;--green:#557b63;--bg:#eee9df;--gold:#c39a55}*{box-sizing:border-box}html,body{height:100%;margin:0}body{background:var(--bg);color:var(--ink);font-family:ui-sans-serif,system-ui,-apple-system,"Microsoft YaHei",sans-serif;padding:14px;overflow:hidden}.app{height:100%;max-width:1120px;margin:auto;display:flex;flex-direction:column;min-height:0}.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 2px 12px}.brand{font-size:12px;letter-spacing:.16em;color:#746e62;font-weight:800}.top small{color:var(--muted);font-size:11px}.layout{display:grid;grid-template-columns:290px minmax(0,1fr);gap:14px;flex:1;min-height:0}.paper{background:var(--paper);border:1px solid #ded7ca;box-shadow:0 8px 30px #44351b12;border-radius:5px;min-height:0}.setup{padding:20px;display:flex;flex-direction:column}.kicker{font-size:10px;letter-spacing:.18em;color:var(--muted);font-weight:800}.setup h1{font-family:Georgia,"Songti SC",serif;font-size:28px;line-height:1.1;margin:8px 0 5px}.sub{font-size:12px;color:var(--muted);line-height:1.5;margin:0 0 20px}.field{margin:0 0 14px}.field label{display:block;font-size:11px;color:#6f6a60;margin-bottom:6px}.input{display:flex;align-items:center;border-bottom:1px solid #bdb5a8;padding:3px 0}.input b{font-family:Georgia,serif;font-size:18px;color:#8b8377}.input input{width:100%;min-width:0;border:0;outline:0;background:none;font:600 20px Georgia,serif;padding:7px;color:var(--ink)}.input input::placeholder{color:#c5beb2;font-size:15px}.hint{font-size:10px;color:#999286;margin-top:5px}.btn{border:1px solid #c9c0b2;background:#f7f3eb;color:#49443b;padding:10px 12px;font-weight:700;font-size:12px;cursor:pointer;border-radius:3px}.btn:disabled{opacity:.4;cursor:not-allowed}.btn.main{background:#343b34;color:white;border-color:#343b34}.btn.red{background:var(--red);color:white;border-color:var(--red)}.btnrow{display:flex;gap:7px;flex-wrap:wrap}.btnrow .btn{flex:1}.error{color:var(--red);font-size:11px;min-height:18px;margin-top:8px}.note{margin-top:auto;padding-top:15px;border-top:1px dashed var(--line);font-size:10px;color:#999286;line-height:1.6}.bill{padding:18px 20px;display:flex;flex-direction:column;min-height:0}.billhead{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;border-bottom:2px solid var(--ink);padding-bottom:12px}.billtitle{font:700 22px Georgia,"Songti SC",serif;letter-spacing:.04em}.billmeta{text-align:right;font-size:10px;color:var(--muted);line-height:1.7}.billmeta strong{color:var(--ink);font-size:11px}.totals{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:8px;padding:12px 0;border-bottom:1px solid var(--line)}.totalbox{min-width:0}.totalbox small{display:block;color:var(--muted);font-size:10px;margin-bottom:5px}.totalbox strong{font:700 20px Georgia,serif;font-variant-numeric:tabular-nums}.totalbox.primary strong{color:var(--red);font-size:25px}.ledgerhead{display:flex;justify-content:space-between;align-items:center;padding:11px 0 7px}.ledgerhead strong{font:700 14px Georgia,"Songti SC",serif}.ledgerhead span{font-size:10px;color:var(--muted)}.tablehead,.entry{display:grid;grid-template-columns:42px minmax(0,1fr) 92px 105px;gap:8px;align-items:center}.tablehead{font-size:9px;color:#918a7e;border-bottom:1px solid var(--line);padding:6px 4px}.entries{overflow:auto;min-height:0;flex:1}.entry{padding:8px 4px;border-bottom:1px dashed #e9e4da;font-size:11px;animation:appear .2s ease}.entry .no{color:#a49c90;font-variant-numeric:tabular-nums}.entry .desc{min-width:0}.entry .desc b{display:block;font-size:11px;font-weight:650}.entry .desc small{display:block;color:#a39b8e;font-size:9px;margin-top:2px}.entry .out{text-align:right;color:var(--red);font:600 12px Georgia,serif;font-variant-numeric:tabular-nums}.entry .balance{text-align:right;color:#625d53;font:11px Georgia,serif;font-variant-numeric:tabular-nums}.entry.posted{background:#faf5ed}.empty{height:100%;min-height:100px;display:grid;place-items:center;text-align:center;color:#aaa294;font-size:12px}.empty span{display:block;font:italic 17px Georgia,serif;margin-bottom:5px;color:#8f8779}.billfoot{border-top:1px solid var(--ink);margin-top:8px;padding-top:9px;display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:10px;color:var(--muted)}.billfoot strong{font:700 17px Georgia,serif;color:var(--red)}.process{display:none;margin-top:10px;border:1px solid #d9cbb7;background:#f8f1e6;padding:10px 12px;flex:0 0 auto}.process.show{display:block;animation:appear .25s ease}.processhead{display:flex;justify-content:space-between;align-items:center;font-size:11px;font-weight:750}.processhead span{color:var(--muted);font-weight:500}.processline{display:flex;justify-content:space-between;gap:8px;align-items:baseline;margin-top:7px}.processline small{color:var(--muted);font-size:10px}.processline strong{font:700 22px Georgia,serif;color:var(--red)}.track{height:4px;background:#e7ddce;margin-top:8px}.fill{height:100%;width:0;background:var(--red);transition:width .12s}.actions{display:flex;gap:6px;margin-top:8px}.actions .btn{padding:6px 9px;font-size:10px}.actions .status{font-size:10px;color:var(--muted);align-self:center;margin-left:auto}@keyframes appear{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@media(max-width:700px){body{padding:8px}.top{margin-bottom:7px}.top small{font-size:9px}.layout{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr);gap:7px}.setup{padding:10px 12px}.setuphead{display:flex;align-items:center;justify-content:space-between;gap:8px}.setup h1{font-size:20px;margin:3px 0}.sub{display:none}.fields{display:grid;grid-template-columns:1fr 1fr;gap:10px}.field{margin:5px 0}.input input{font-size:17px;padding:4px}.hint{display:none}.setup .btn.main{padding:8px}.note{display:none}.bill{padding:10px 12px}.billtitle{font-size:18px}.totals{padding:8px 0;gap:5px}.totalbox small{font-size:9px}.totalbox strong{font-size:16px}.totalbox.primary strong{font-size:20px}.ledgerhead{padding:7px 0 5px}.tablehead,.entry{grid-template-columns:30px minmax(0,1fr) 72px 82px;gap:5px}.entry{padding:6px 3px}.entry .desc b{font-size:10px}.entry .out{font-size:11px}.entry .balance{font-size:10px}.process{margin-top:7px;padding:8px}.processline strong{font-size:19px}.billfoot{padding-top:6px;margin-top:5px}.billfoot strong{font-size:15px}}
+@media(max-height:650px){body{padding-top:6px;padding-bottom:6px}.top{margin-bottom:5px}.setup{padding-top:10px;padding-bottom:10px}.sub,.note{display:none}.field{margin-bottom:8px}.bill{padding-top:10px;padding-bottom:9px}.entry{padding-top:5px;padding-bottom:5px}.process{padding:7px 9px}.processline{margin-top:3px}.actions{margin-top:5px}}
+</style></head><body><div class="app">
+<header class="top"><div class="brand">P E R S O N A L&nbsp; E X P E N S E&nbsp; S T A T E M E N T</div><small>模拟账单 · 金额随机拆分</small></header>
+<main class="layout">
+<section class="paper setup"><div class="setuphead"><div><div class="kicker">NEW STATEMENT / 新建账单</div><h1>消费账单</h1></div></div><p class="sub">把一笔总金额拆成多笔随机消费，看看不起眼的小额支出，最后会累积成多少。</p>
+<div class="fields"><div class="field"><label for="total">账单总额（人民币）</label><div class="input"><b>¥</b><input id="total" type="number" min=".01" step=".01" placeholder="0.00" inputmode="decimal"></div></div>
+<div class="field"><label for="parts">消费笔数</label><div class="input"><input id="parts" type="number" min="1" max="10000" step="1" placeholder="例如 24" inputmode="numeric"><b style="font-size:12px">笔</b></div><div class="hint">单笔最低 ¥0.01</div></div></div>
+<button class="btn main" id="generate">生成随机消费账单　→</button><div class="error" id="error" role="alert"></div>
+<div class="note">说明：每笔消费随机分配，金额以“分”为单位计算。所有流水相加后，账单总额与输入金额完全一致。</div></section>
+<section class="paper bill">
+<div class="billhead"><div><div class="kicker">EXPENSE RECEIPT</div><div class="billtitle">消费明细单</div></div><div class="billmeta">账单编号　<strong id="billNo">等待生成</strong><br>记账状态　<strong id="billState">未生成</strong></div></div>
+<div class="totals"><div class="totalbox primary"><small>本期支出总额</small><strong id="sum">¥0.00</strong></div><div class="totalbox"><small>单笔最低</small><strong id="min">—</strong></div><div class="totalbox"><small>单笔最高</small><strong id="max">—</strong></div></div>
+<div class="ledgerhead"><strong>记账流水 / EXPENSE RECORDS</strong><span id="count">0 笔记录</span></div>
+<div class="tablehead"><span>序号</span><span>消费项目</span><span style="text-align:right">本笔支出</span><span style="text-align:right">累计支出</span></div>
+<div class="entries" id="entries"><div class="empty"><div><span>账单尚未生成</span>输入总额与消费笔数<br>生成一份随机消费明细</div></div></div>
+<div class="billfoot"><span id="footLabel">TOTAL / 本期累计支出</span><strong id="footTotal">¥0.00</strong></div>
+<button class="btn red" id="showProcess" style="width:100%;margin-top:9px" disabled>▶　开始逐笔记账</button>
+<section class="process" id="process" aria-live="polite"><div class="processhead">正在登记消费流水 <span id="progress">0 / 0 笔</span></div><div class="processline"><small id="processLabel">等待第一笔消费入账</small><strong id="liveTotal">¥0.00</strong></div><div class="track"><div class="fill" id="fill"></div></div><div class="actions"><button class="btn" id="pause" disabled>暂停</button><button class="btn" id="skip" disabled>完成记账</button><button class="btn" id="again" disabled>重新记账</button><span class="status" id="status">尚未开始</span></div></section>
+</section></main></div>
 <script>
-(() => {
-  const $ = id => document.getElementById(id);
-  let values = [], timer = null, startDelay = null, index = 0, running = false, paused = false, sum = 0;
-  const money = cents => '¥' + (cents / 100).toLocaleString('zh-CN',{minimumFractionDigits:2,maximumFractionDigits:2});
-  const randomInt = max => {
-    if (max <= 0) return 0;
-    if (window.crypto && crypto.getRandomValues) {
-      const range = 0x100000000, limit = range - range % max;
-      const a = new Uint32Array(1); let n;
-      do { crypto.getRandomValues(a); n = a[0]; } while (n >= limit);
-      return n % max;
-    }
-    return Math.floor(Math.random() * max);
-  };
-  function renderAmounts() {
-    $('amounts').innerHTML = '';
-    const frag = document.createDocumentFragment();
-    values.forEach((v,i) => {
-      const el = document.createElement('div'); el.className='amount';
-      const small = document.createElement('small'); small.textContent = `第 ${i+1} 份`;
-      const b = document.createElement('b'); b.textContent = money(v);
-      el.append(small,b); frag.append(el);
-    });
-    $('amounts').append(frag);
-    $('count').textContent = `${values.length.toLocaleString()} 份随机余额`;
-    $('sum').textContent = money(values.reduce((a,b)=>a+b,0));
-    $('min').textContent = money(Math.min(...values));
-    $('max').textContent = money(Math.max(...values));
-  }
-  function resetCollector() {
-    clearInterval(timer); clearTimeout(startDelay); timer=null; startDelay=null; index=0; sum=0; running=false; paused=false;
-    $('collector').classList.remove('show'); $('showProcess').disabled=true; $('showProcess').textContent='🪙 展示所有小余额加起来的过程';
-    $('liveTotal').textContent=money(0); $('collectCount').textContent=`0 / ${values.length}`;
-    $('bar').style.width='0%'; $('progressText').textContent='准备开始'; $('percent').textContent='0%';
-    $('currentLabel').textContent='等待第一笔小余额'; $('currentAmount').textContent='+¥0.00';
-    $('pause').disabled=true; $('pause').textContent='⏸ 暂停'; $('skip').disabled=true; $('again').disabled=true;
-  }
-  function generate() {
-    $('error').textContent='';
-    const raw=$('total').value.trim(), count=Number($('parts').value);
-    if (!raw || !Number.isFinite(Number(raw)) || !/^\d+(\.\d{1,2})?$/.test(raw) || Number(raw)<=0) {
-      $('error').textContent='请输入大于 0 且最多包含两位小数的总金额。'; return;
-    }
-    const cents=Math.round(Number(raw)*100);
-    if (!Number.isSafeInteger(cents) || cents<1) {$('error').textContent='金额超出可处理范围。';return;}
-    if (!Number.isInteger(count) || count<1 || count>10000 || count>cents) {
-      $('error').textContent='份数须为 1–10,000 的整数，并且不能超过总金额的分数（每份至少 0.01 元）。';return;
-    }
-    // 在总金额的分数位置中抽取 count-1 个不同切点，得到严格为正的随机分配。
-    const cuts=[];
-    if (count>1) {
-      // 部分 Fisher–Yates：从 [1, cents-1] 中无放回抽样。
-      const pool=Array.from({length:cents-1},(_,i)=>i+1);
-      for(let i=0;i<count-1;i++){const j=i+randomInt(pool.length-i);[pool[i],pool[j]]=[pool[j],pool[i]];cuts.push(pool[i]);}
-      cuts.sort((a,b)=>a-b);
-    }
-    values=[]; let prev=0;
-    for(const cut of cuts){values.push(cut-prev);prev=cut;}
-    values.push(cents-prev);
-    // 随机打乱份数顺序。
-    for(let i=values.length-1;i>0;i--){const j=randomInt(i+1);[values[i],values[j]]=[values[j],values[i]];}
-    renderAmounts(); resetCollector(); $('showProcess').disabled=false;
-  }
-  function updateProgress() {
-    $('liveTotal').textContent=money(sum);
-    $('collectCount').textContent=`${index} / ${values.length}`;
-    const p=values.length ? index/values.length*100 : 0;
-    $('bar').style.width=p+'%'; $('percent').textContent=Math.floor(p)+'%';
-    $('progressText').textContent=index===values.length?'全部小余额已汇总！':`已累加 ${index} 笔`;
-  }
-  function finish() {
-    clearInterval(timer);timer=null;index=values.length;sum=values.reduce((a,b)=>a+b,0);
-    $('liveTotal').textContent=money(sum);$('currentLabel').textContent='🎉 汇总完成';$('currentAmount').textContent='+'+money(values[values.length-1]||0);
-    updateProgress();running=false;paused=false;
-    $('pause').disabled=true;$('skip').disabled=true;$('again').disabled=false;
-    $('showProcess').disabled=false;$('showProcess').textContent='↻ 再看一次累加过程';
-  }
-  function tick() {
-    if(index>=values.length){finish();return;}
-    const v=values[index];sum+=v;index++;
-    $('currentLabel').textContent=`第 ${index} 笔小余额加入`;
-    $('currentAmount').textContent='+'+money(v);
-    updateProgress();
-    if(index>=values.length)finish();
-  }
-  function play() {
-    if(!values.length)return;
-    clearInterval(timer);$('collector').classList.add('show');
-    if(index>=values.length){index=0;sum=0;updateProgress();}
-    running=true;paused=false;$('pause').disabled=false;$('pause').textContent='⏸ 暂停';$('skip').disabled=false;$('again').disabled=true;
-    tick(); if(index<values.length)timer=setInterval(tick,Math.max(35,Math.min(180,18000/values.length)));
-  }
-  $('total').addEventListener('input',()=>{$('showProcess').disabled=true;});
-  $('parts').addEventListener('input',()=>{$('showProcess').disabled=true;});
-  $('generate').addEventListener('click',generate);
-  $('showProcess').addEventListener('click',()=>{
-    if(!values.length || running || paused || startDelay) return;
-    $('collector').classList.add('show');
-    $('showProcess').disabled=true;
-    $('collector').scrollIntoView({behavior:'smooth',block:'center'});
-    // 等待平滑滚动基本完成后才开始累加，确保玩家能看到从 0 到第一笔的完整开场。
-    startDelay=setTimeout(()=>{
-      startDelay=null;
-      index=0;sum=0;updateProgress();
-      $('currentLabel').textContent='开始汇总零碎余额';
-      $('currentAmount').textContent='+¥0.00';
-      play();
-    },500);
-  });
-  $('pause').addEventListener('click',()=>{
-    if(!running&&!paused)return;
-    if(!paused){clearInterval(timer);timer=null;paused=true;running=false;$('pause').textContent='▶ 继续';}
-    else{paused=false;running=true;$('pause').textContent='⏸ 暂停';timer=setInterval(tick,Math.max(35,Math.min(180,18000/values.length)));}
-  });
-  $('skip').addEventListener('click',finish);
-  $('again').addEventListener('click',()=>{index=0;sum=0;updateProgress();$('currentLabel').textContent='重新开始汇总';$('currentAmount').textContent='+¥0.00';play();});
-})();
-</script>
-</body>
-</html>
+(()=>{const $=id=>document.getElementById(id);let values=[],timer=null,delay=null,index=0,running=false,paused=false,sum=0;const money=n=>'¥'+(n/100).toLocaleString('zh-CN',{minimumFractionDigits:2,maximumFractionDigits:2});const rand=max=>{if(max<=0)return 0;const a=new Uint32Array(1),range=4294967296,limit=range-range%max;let n;do{crypto.getRandomValues(a);n=a[0]}while(n>=limit);return n%max};
+function render(){const box=$('entries');box.replaceChildren();$('count').textContent=values.length+' 笔消费记录';$('sum').textContent=money(values.reduce((a,b)=>a+b,0));$('min').textContent=money(Math.min(...values));$('max').textContent=money(Math.max(...values));$('billNo').textContent='EXP-'+Date.now().toString().slice(-8);$('billState').textContent='待记账';values.forEach((v,i)=>{const row=document.createElement('div');row.className='entry';row.dataset.index=i;const no=document.createElement('span');no.className='no';no.textContent=String(i+1).padStart(2,'0');const desc=document.createElement('div');desc.className='desc';const name=document.createElement('b');name.textContent=['日常消费','餐饮支出','交通出行','生活缴费','随手购物'][i%5];const date=document.createElement('small');date.textContent='待入账 · 消费支出';desc.append(name,date);const out=document.createElement('span');out.className='out';out.textContent='-'+money(v);const bal=document.createElement('span');bal.className='balance';bal.textContent='—';row.append(no,desc,out,bal);box.append(row)});$('footTotal').textContent=money(0);$('showProcess').disabled=false;reset()};
+function reset(){clearInterval(timer);clearTimeout(delay);timer=delay=null;index=0;sum=0;running=paused=false;$('process').classList.remove('show');$('showProcess').disabled=!values.length;$('showProcess').textContent='▶　开始逐笔记账';$('liveTotal').textContent=money(0);$('progress').textContent='0 / '+values.length+' 笔';$('fill').style.width='0%';$('processLabel').textContent='等待第一笔消费入账';$('status').textContent='尚未开始';$('pause').disabled=true;$('pause').textContent='暂停';$('skip').disabled=true;$('again').disabled=true;$('footTotal').textContent=money(0);$('footLabel').textContent='TOTAL / 本期累计支出';$('billState').textContent='待记账';document.querySelectorAll('.entry').forEach(r=>{r.classList.remove('posted');r.querySelector('.desc small').textContent='待入账 · 消费支出';r.querySelector('.balance').textContent='—'})}
+function validate(){const raw=$('total').value.trim(),count=Number($('parts').value);if(!raw||!/^[0-9]+(\.[0-9]{1,2})?$/.test(raw)||!Number.isFinite(Number(raw))||Number(raw)<=0){$('error').textContent='请输入有效账单总额，最多保留两位小数。';return}const cents=Math.round(Number(raw)*100);if(!Number.isSafeInteger(cents)||cents<1){$('error').textContent='账单金额超出处理范围。';return}if(!Number.isInteger(count)||count<1||count>10000||count>cents){$('error').textContent='消费笔数须为 1–10,000 的整数，且不能超过总金额的分数。';return}
+const chosen=new Set();for(let j=cents-count+1;j<=cents-1;j++){const t=rand(j);chosen.add(chosen.has(t)?j:t)}const cuts=[...chosen].sort((a,b)=>a-b);values=[];let prev=0;for(const c of cuts){values.push(c-prev);prev=c}values.push(cents-prev);for(let i=values.length-1;i>0;i--){const j=rand(i+1);[values[i],values[j]]=[values[j],values[i]]}$('error').textContent='';render()}
+function postOne(){if(index>=values.length){finish();return}const v=values[index],row=document.querySelector('.entry[data-index="'+index+'"]');sum+=v;index++;row.classList.add('posted');row.querySelector('.desc small').textContent='已入账 · 消费支出';row.querySelector('.balance').textContent=money(sum);row.scrollIntoView({block:'nearest',behavior:'smooth'});$('liveTotal').textContent=money(sum);$('footTotal').textContent=money(sum);$('progress').textContent=index+' / '+values.length+' 笔';$('fill').style.width=(index/values.length*100)+'%';$('processLabel').textContent='刚刚登记：-'+money(v);$('status').textContent='已登记 '+index+' 笔';if(index===values.length)finish()}
+function finish(){clearInterval(timer);timer=null;index=values.length;sum=values.reduce((a,b)=>a+b,0);$('liveTotal').textContent=money(sum);$('footTotal').textContent=money(sum);$('progress').textContent=index+' / '+values.length+' 笔';$('fill').style.width='100%';$('processLabel').textContent='全部消费已登记';$('status').textContent='✓ 记账完成';$('billState').textContent='已完成';running=paused=false;$('pause').disabled=true;$('skip').disabled=true;$('again').disabled=false;$('showProcess').disabled=false;$('showProcess').textContent='↻　重新播放记账过程'}
+function start(){if(!values.length)return;clearInterval(timer);if(index>=values.length){reset()}running=true;paused=false;$('pause').disabled=false;$('pause').textContent='暂停';$('skip').disabled=false;$('again').disabled=true;$('showProcess').disabled=true;postOne();if(index<values.length)timer=setInterval(postOne,Math.max(100,Math.min(450,9000/values.length)))}
+$('generate').addEventListener('click',validate);$('total').addEventListener('input',()=>{$('showProcess').disabled=true});$('parts').addEventListener('input',()=>{$('showProcess').disabled=true});$('showProcess').addEventListener('click',()=>{if(!values.length||running||paused||delay)return;$('process').classList.add('show');$('showProcess').disabled=true;$('process').scrollIntoView({behavior:'smooth',block:'nearest'});delay=setTimeout(()=>{delay=null;reset();$('process').classList.add('show');start()},450)});$('pause').addEventListener('click',()=>{if(running){clearInterval(timer);timer=null;running=false;paused=true;$('pause').textContent='继续';$('status').textContent='已暂停'}else if(paused){paused=false;running=true;$('pause').textContent='暂停';$('status').textContent='继续记账';timer=setInterval(postOne,Math.max(100,Math.min(450,9000/values.length)))}});$('skip').addEventListener('click',finish);$('again').addEventListener('click',()=>{reset();$('process').classList.add('show');start()})})();
+</script></body></html>
