@@ -684,4 +684,116 @@ document.addEventListener('click',e=>{if(!e.target.closest('.custom-select')&&!e
  #toolsMain .toolsGrid .currentBookTool{grid-template-rows:15px 40px!important;gap:5px!important}
  #ledgerMain .ledgerFooter{gap:6px!important;font-size:9px!important}
 }
-</style></body></html>
+</style>
+<style>
+/* 最终覆盖：价格区始终显示原价/优惠；可计算时单价紧跟在其右侧 */
+#ledgerMain .mRecord>.recordRight .priceTop,
+#ledgerMain .mRecord .priceTop:not(:has(.priceMeta)){
+ display:grid!important;
+ grid-template-columns:max-content max-content!important;
+ grid-auto-flow:row!important;
+ justify-content:end!important;
+ align-items:baseline!important;
+ column-gap:6px!important;
+ row-gap:0!important;
+ width:100%!important;
+ min-width:0!important;
+ white-space:nowrap!important;
+ visibility:visible!important;
+ opacity:1!important;
+}
+#ledgerMain .mRecord .priceTop>.originalPriceLine{
+ grid-column:1!important;
+ grid-row:1!important;
+ display:inline-flex!important;
+ flex-direction:row!important;
+ align-items:baseline!important;
+ justify-content:flex-end!important;
+ justify-self:end!important;
+ order:0!important;
+ min-width:0!important;
+ white-space:nowrap!important;
+}
+#ledgerMain .mRecord .priceTop>.priceMeta{
+ grid-column:2!important;
+ grid-row:1!important;
+ display:inline-flex!important;
+ align-items:baseline!important;
+ justify-self:end!important;
+ align-self:baseline!important;
+ order:1!important;
+ width:auto!important;
+ margin:0!important;
+ white-space:nowrap!important;
+}
+/* 工具页：两列网格、统一按钮尺寸和对齐 */
+#toolsMain .toolsGrid{
+ display:grid!important;
+ grid-template-columns:repeat(2,minmax(0,1fr))!important;
+ grid-auto-rows:minmax(42px,auto)!important;
+ align-items:stretch!important;
+ justify-items:stretch!important;
+ gap:9px!important;
+}
+#toolsMain .toolsGrid>*{
+ min-width:0!important;
+ width:100%!important;
+ min-height:42px!important;
+ box-sizing:border-box!important;
+ align-self:stretch!important;
+}
+#toolsMain .toolsGrid .currentBookTool{
+ grid-column:1!important;
+ grid-row:1!important;
+ display:grid!important;
+ grid-template-rows:16px 42px!important;
+ align-content:start!important;
+ align-items:stretch!important;
+ justify-content:stretch!important;
+ gap:5px!important;
+ min-height:63px!important;
+ line-height:16px!important;
+}
+#toolsMain .toolsGrid .currentBookTool select{
+ display:block!important;
+ width:100%!important;
+ height:42px!important;
+ min-height:42px!important;
+ max-height:42px!important;
+ margin:0!important;
+ box-sizing:border-box!important;
+}
+#toolsMain .toolsGrid #newBook{grid-column:2!important;grid-row:1!important;align-self:end!important;height:42px!important;min-height:42px!important}
+#toolsMain .toolsGrid #renameBook{grid-column:1!important;grid-row:2!important}
+#toolsMain .toolsGrid #manageBooks{grid-column:2!important;grid-row:2!important}
+#toolsMain .toolsGrid #mJson{grid-column:1!important;grid-row:3!important}
+#toolsMain .toolsGrid #mCsv{grid-column:2!important;grid-row:3!important}
+#toolsMain .toolsGrid #mImport{grid-column:1!important;grid-row:4!important}
+#toolsMain .toolsGrid #manageCats{grid-column:2!important;grid-row:4!important}
+#toolsMain .toolsGrid #manageUnits{grid-column:1!important;grid-row:5!important}
+#toolsMain .toolsGrid #resetLocal{grid-column:2!important;grid-row:5!important}
+#toolsMain .toolsGrid #generateTestBill{grid-column:1/-1!important;grid-row:6!important}
+#toolsMain .toolsGrid .btn{
+ display:flex!important;
+ align-items:center!important;
+ justify-content:center!important;
+ width:100%!important;
+ height:42px!important;
+ min-height:42px!important;
+ max-height:42px!important;
+ margin:0!important;
+ padding:0 10px!important;
+ box-sizing:border-box!important;
+ line-height:1.2!important;
+ text-align:center!important;
+ white-space:normal!important;
+}
+@media(max-width:700px){
+ #toolsMain .toolsGrid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}
+ #toolsMain .toolsGrid .currentBookTool{grid-column:1!important;grid-row:1!important;grid-template-rows:15px 40px!important;min-height:60px!important;gap:5px!important}
+ #toolsMain .toolsGrid .currentBookTool select{height:40px!important;min-height:40px!important;max-height:40px!important}
+ #toolsMain .toolsGrid .btn{height:40px!important;min-height:40px!important;max-height:40px!important;padding:0 6px!important;font-size:11px!important}
+ #toolsMain .toolsGrid #newBook{height:40px!important;min-height:40px!important}
+}
+</style>
+</body></html>
