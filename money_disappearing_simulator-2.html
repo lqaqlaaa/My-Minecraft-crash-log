@@ -344,34 +344,37 @@ function buildBookMenu(id){let menu=$(id);if(!menu)return;menu.innerHTML='';book
 function filtered(){let p=$('mPeriod').value,sel=$('mPeriodKey'),records=current().records,wrap=document.querySelector('.custom-select[data-for="mPeriodKey"]');if(p==='all'){sel.innerHTML='';sel.disabled=true;if(wrap)wrap.style.display='none';syncCustom();return records}if(wrap)wrap.style.display='';let keys=[...new Set(records.map(r=>periodKey(r,p)))].sort().reverse(),keep=sel.value;sel.innerHTML='';keys.forEach(k=>{let o=document.createElement('option');o.value=k;o.textContent=k;sel.append(o)});if(keys.includes(keep))sel.value=keep;else if(keys.length)sel.selectedIndex=0;sel.disabled=!keys.length;syncCustom();return records.filter(r=>periodKey(r,p)===sel.value)}
 function periodKey(r,p){let d=new Date(r.date),y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');if(p==='day')return y+'-'+m+'-'+day;if(p==='month')return y+'-'+m;if(p==='year')return ''+y;if(p==='week'){let x=new Date(Date.UTC(y,d.getMonth(),d.getDate()));x.setUTCDate(x.getUTCDate()+4-(x.getUTCDay()||7));let yr=x.getUTCFullYear(),first=new Date(Date.UTC(yr,0,1));return yr+'-W'+String(Math.ceil((((x-first)/86400000)+1)/7)).padStart(2,'0')}return 'all'}
 function render(){renderBookSelect();let rows=filtered(),total=rows.reduce((a,r)=>a+r.amount,0),discountTotal=rows.reduce((a,r)=>a+(Number.isSafeInteger(r.discount)?r.discount:0),0),cats={};rows.forEach(r=>cats[r.category||'未分类']=(cats[r.category||'未分类']||0)+r.amount);$('mTotalFoot').textContent=fmt(total)+'（总优惠：'+fmt(discountTotal)+'）';$('mCatCountFoot').textContent=Object.keys(cats).length+' 类';$('mCountFoot').textContent=rows.length+' 笔消费';renderRecords('mRecords',rows,true);renderRecords('viewerRecords',rows,false);renderRanking(rows,cats)}function enableTouchSort(list){
- if(list.dataset.touchSort)return;list.dataset.touchSort='1';let drag=null,over=null;
- const clear=()=>{if(drag?.el)drag.el.classList.remove('dragging');if(over)over.classList.remove('drag-over');drag=null;over=null};
+ if(list.dataset.touchSort)return;list.dataset.touchSort='1';let drag=null,over=null,longPress=null;
+ const clear=()=>{if(longPress)clearTimeout(longPress);longPress=null;if(drag?.el)drag.el.classList.remove('dragging');if(over)over.classList.remove('drag-over');drag=null;over=null};
+ const setTarget=(x,y)=>{let node=document.elementFromPoint(x,y),item=node?.closest('.mRecord'),head=node?.closest('.categoryGroupHead'),group=head?.closest('.categoryGroup');if(over)over.classList.remove('drag-over');over=drag?.kind==='item'?item:(group&&head?group:null);if(over&&over!==drag.el)over.classList.add('drag-over')};
  list.addEventListener('pointerdown',e=>{
-  if(e.pointerType!=='touch'&&e.pointerType!=='pen')return;
-  let handle=e.target.closest('.itemDragHandle,.categoryDrag'),item=e.target.closest('.mRecord'),group=e.target.closest('.categoryGroup');
-  if(!handle||(!item&&!group))return;
-  if(handle.classList.contains('itemDragHandle')&&item)drag={kind:'item',id:item.dataset.recordId,el:item,pointerId:e.pointerId};
-  else if(handle.classList.contains('categoryDrag')&&group)drag={kind:'category',category:group.dataset.category,el:group,pointerId:e.pointerId};
-  else return;
-  drag.el.classList.add('dragging');e.preventDefault();
- },{passive:false});
+  if(e.button!==undefined&&e.button!==0)return;
+  let item=e.target.closest('.mRecord'),group=e.target.closest('.categoryGroup'),categoryHandle=e.target.closest('.categoryDrag');
+  if(item){
+   drag={kind:'item',id:item.dataset.recordId,el:item,pointerId:e.pointerId,startX:e.clientX,startY:e.clientY,active:false,pointerType:e.pointerType};
+   if(e.pointerType==='touch'||e.pointerType==='pen')longPress=setTimeout(()=>{if(drag&&drag.pointerId===e.pointerId){drag.active=true;drag.el.classList.add('dragging');setTarget(drag.startX,drag.startY)}},230);
+   return;
+  }
+  if(categoryHandle&&group&&(e.pointerType==='touch'||e.pointerType==='pen')){drag={kind:'category',category:group.dataset.category,el:group,pointerId:e.pointerId,startX:e.clientX,startY:e.clientY,active:false,pointerType:e.pointerType};longPress=setTimeout(()=>{if(drag&&drag.pointerId===e.pointerId){drag.active=true;drag.el.classList.add('dragging')}},230);return}
+ },{passive:true});
  document.addEventListener('pointermove',e=>{
-  if(!drag||e.pointerId!==drag.pointerId)return;e.preventDefault();
-  let target=document.elementFromPoint(e.clientX,e.clientY),item=target?.closest('.mRecord'),head=target?.closest('.categoryGroupHead'),group=head?.closest('.categoryGroup');
-  if(over)over.classList.remove('drag-over');
-  over=drag.kind==='item'?item:(group&&head?group:null);
-  if(over&&over!==drag.el)over.classList.add('drag-over');
+  if(!drag||e.pointerId!==drag.pointerId)return;
+  let dx=e.clientX-drag.startX,dy=e.clientY-drag.startY,distance=Math.hypot(dx,dy);
+  if(!drag.active){
+   if(drag.pointerType==='touch'||drag.pointerType==='pen'){if(distance>10&&!longPress){clear();return}if(!longPress&&distance>10){clear();return}}
+   else if(distance>5){drag.active=true;drag.el.classList.add('dragging')}
+  }
+  if(!drag.active)return;
+  e.preventDefault();setTarget(e.clientX,e.clientY);
  },{passive:false});
  document.addEventListener('pointerup',e=>{
   if(!drag||e.pointerId!==drag.pointerId)return;
-  let source=drag,target=over;clear();if(!target||target===source.el)return;
+  let source=drag,target=over,active=source.active;clear();if(!active||!target||target===source.el)return;
   if(source.kind==='category'){
    let targetGroup=target.closest('.categoryGroup'),to=targetGroup?categories.indexOf(targetGroup.dataset.category):-1,from=categories.indexOf(source.category);
    if(from>=0&&to>=0&&from!==to){let moved=categories.splice(from,1)[0];categories.splice(to,0,moved);saveCats();render()}return;
   }
-  let records=current().records,moving=records.find(x=>x.id===source.id);if(!moving)return;
-  let targetItem=target.closest('.mRecord');if(!targetItem)return;
-  swapRecordSlots('mRecords',source.id,targetItem.dataset.recordId);
+  let targetItem=target.closest('.mRecord');if(targetItem)swapRecordSlots('mRecords',source.id,targetItem.dataset.recordId);
  },{passive:false});
  document.addEventListener('pointercancel',e=>{if(drag&&e.pointerId===drag.pointerId)clear()});
 }function renderRecords(target,rows,actions){
@@ -391,23 +394,15 @@ function render(){renderBookSelect();let rows=filtered(),total=rows.reduce((a,r)
   let sum=items.reduce((a,r)=>a+r.amount,0);
   group.innerHTML='<div class="categoryGroupHead"><span class="categoryDrag dragHandle" aria-label="拖动类别">⠿</span><span>'+esc(category)+'</span><strong>'+fmt(sum)+'</strong></div>';
   items.forEach(r=>{
-   let q=Math.max(1,Number(r.quantity)||1),validUnit=Number.isSafeInteger(r.unitPrice)&&r.unitPrice*q===(Number.isSafeInteger(r.grossAmount)?r.grossAmount:r.amount+(Number.isSafeInteger(r.discount)?r.discount:0));
+   let q=Math.max(1,Number(r.quantity)||1),unitTotal=Number.isSafeInteger(r.grossAmount)?r.grossAmount:r.amount+(Number.isSafeInteger(r.discount)?r.discount:0),validUnit=Number.isSafeInteger(unitTotal)&&unitTotal%q===0,computedUnit=validUnit?unitTotal/q:0;
    let el=document.createElement('div');el.className='mRecord';el.dataset.recordId=r.id;
    if(actions){
-    el.draggable=true;
-    el.addEventListener('dragstart',e=>{e.stopPropagation();e.dataTransfer.setData('text/plain',JSON.stringify({kind:'item',id:r.id}));e.dataTransfer.effectAllowed='move';el.classList.add('dragging')});
-    el.addEventListener('dragend',()=>el.classList.remove('dragging'));
-    el.addEventListener('dragover',e=>{e.preventDefault();e.stopPropagation();el.classList.add('drag-over')});
-    el.addEventListener('dragleave',()=>el.classList.remove('drag-over'));
-    el.addEventListener('drop',e=>{e.preventDefault();e.stopPropagation();el.classList.remove('drag-over');let data;try{data=JSON.parse(e.dataTransfer.getData('text/plain'))}catch(_){return}if(data.kind!=='item'||data.id===r.id)return;
-     let records=current().records,from=records.findIndex(x=>x.id===data.id),to=records.findIndex(x=>x.id===r.id);if(from<0||to<0)return;
-     swapRecordSlots('mRecords',data.id,r.id);
-    });
+    el.draggable=false;
    }
    let discount=Number.isSafeInteger(r.discount)?r.discount:0,gross=Number.isSafeInteger(r.grossAmount)?r.grossAmount:r.amount+discount;
    let quantityText='('+q+(r.unitName?esc(r.unitName):'')+')';
-   let unitMarkup=validUnit?'<button class="priceMeta" data-edit="unit">单价 '+fmt(r.unitPrice)+'</button>':'<span class="priceMeta"></span>';
-   el.innerHTML='<span class="dragHandle itemDragHandle" aria-label="拖动物品">⠿</span><div class="recordInfo"><div class="nameLine"><button class="editLink itemName" data-edit="name">'+esc(r.item)+'</button><button class="quantityTag" data-edit="quantity">'+quantityText+'</button></div><button class="editLink recordMeta" data-edit="date">'+new Date(r.date).toLocaleString('zh-CN',{hour12:false})+'</button></div><div class="recordRight"><div class="priceTop">'+(validUnit?'<button class="priceMeta" data-edit="unit">单价 '+fmt(r.unitPrice)+'</button>':'<button class="priceMeta" data-edit="unit">设置单价</button>')+'<div class="originalPriceLine"><button class="priceLink originalPrice" data-edit="gross">原价 '+fmt(gross)+'</button>'+(discount>0?'<button class="discountLink" data-edit="discount">优惠 -'+fmt(discount)+'</button>':'<button class="discountLink" data-edit="discount">添加优惠</button>')+'</div></div><div class="netPriceCenter"><span class="netPrice">'+fmt(r.amount)+'</span></div><div class="itemTools"><button data-act="cat">切换类别</button><button data-act="del">删除</button></div></div>';
+   let unitMarkup=validUnit?'<button class="priceMeta" data-edit="unit">单价 '+fmt(computedUnit)+'</button>':'';
+   el.innerHTML='<span class="dragHandle itemDragHandle" aria-label="拖动物品">⠿</span><div class="recordInfo"><div class="nameLine"><button class="editLink itemName" data-edit="name">'+esc(r.item)+'</button><button class="quantityTag" data-edit="quantity">'+quantityText+'</button></div><button class="editLink recordMeta" data-edit="date">'+new Date(r.date).toLocaleString('zh-CN',{hour12:false})+'</button></div><div class="recordRight"><div class="priceTop">'+(validUnit?'<button class="priceMeta" data-edit="unit">单价 '+fmt(computedUnit)+'</button>':'')+'<div class="originalPriceLine"><button class="priceLink originalPrice" data-edit="gross">原价 '+fmt(gross)+'</button>'+(discount>0?'<button class="discountLink" data-edit="discount">优惠 -'+fmt(discount)+'</button>':'<button class="discountLink" data-edit="discount">添加优惠</button>')+'</div></div><div class="netPriceCenter"><span class="netPrice">'+fmt(r.amount)+'</span></div><div class="itemTools"><button data-act="cat">切换类别</button><button data-act="del">删除</button></div></div>';
    if(actions){el.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>openRecordFieldEdit(r.id,b.dataset.edit));el.querySelector('[data-act=cat]').onclick=()=>editCategory(r.id);el.querySelector('[data-act=del]').onclick=()=>confirmAction('delete',r.id,'删除这条消费记录？')}
    else{el.querySelector('.itemTools').remove();el.querySelector('.dragHandle').remove();el.querySelectorAll('[data-edit]').forEach(b=>{b.outerHTML='<span class="'+b.className+'">'+b.innerHTML+'</span>'})}
    group.append(el);
@@ -626,4 +621,21 @@ document.addEventListener('click',e=>{if(!e.target.closest('.custom-select')&&!e
 #ledgerMain .ledgerFooter span:has(#mCatCountFoot){order:2!important;margin-left:0!important}
 #ledgerMain .ledgerFooter span:has(#mTotalFoot){order:4!important;margin-left:0!important}
 #ledgerMain .ledgerFooter .footerExport{order:1!important}
+</style><style>
+/* 账单行整块拖动；单价置于价格区最上方；操作按钮贴右紧邻 */
+#ledgerMain .mRecord{cursor:grab!important;user-select:none!important;-webkit-user-select:none!important;position:relative!important}
+#ledgerMain .mRecord:active{cursor:grabbing!important}
+#ledgerMain .mRecord .recordRight{width:100%!important;align-items:flex-end!important}
+#ledgerMain .mRecord .priceTop{width:100%!important;align-items:flex-end!important}
+#ledgerMain .mRecord .priceTop>.priceMeta{order:0!important;display:block!important;align-self:flex-end!important;margin:0!important;text-align:right!important}
+#ledgerMain .mRecord .originalPriceLine{order:1!important;justify-content:flex-end!important;align-self:flex-end!important}
+#ledgerMain .mRecord .itemTools{width:100%!important;display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:flex-end!important;align-self:stretch!important;gap:3px!important;margin:0!important;padding:0!important}
+#ledgerMain .mRecord .itemTools button{flex:0 0 auto!important;margin:0!important;padding:1px 0!important;white-space:nowrap!important}
+#ledgerMain .mRecord.dragging{opacity:.72!important;z-index:2!important;transform:scale(.985)!important;box-shadow:0 8px 22px #0003!important;outline:2px solid var(--accent)!important;outline-offset:-2px!important}
+#ledgerMain .mRecord.drag-over{outline:2px dashed var(--accent)!important;outline-offset:-3px!important;background:var(--surface-2)!important;transform:scale(1.012)!important}
+#ledgerMain .mRecord .itemDragHandle{pointer-events:none!important;opacity:.45!important}
+#ledgerMain .mRecord .priceMeta{white-space:nowrap!important}
+#ledgerMain .mRecord .priceTop:empty{display:none!important}
+#ledgerMain .mRecord .priceTop:not(:has(.priceMeta)){display:none!important}
+#ledgerMain .mRecord .priceTop:has(.originalPriceLine):not(:has(.priceMeta)){gap:0!important}
 </style></body></html>
