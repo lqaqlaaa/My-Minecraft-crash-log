@@ -480,7 +480,7 @@ function openRecordFieldEdit(id,field){
   $('recordFieldClose').onclick=$('recordFieldCancel').onclick=()=>close('recordFieldModal');
   modal.addEventListener('click',e=>{if(e.target===modal)close('recordFieldModal')});
  }
- $('recordFieldTitle').textContent=config.title;$('recordFieldLabel').textContent=config.label;
+ $('recordFieldTitle').textContent=config.title;$('recordFieldLabel').textContent=config.label;$('recordFieldLabel').querySelector('input')?.remove();
  let input=document.createElement('input');input.type=config.type;input.value=config.value;input.placeholder=config.placeholder||'';if(config.min!==undefined)input.min=config.min;if(config.step!==undefined)input.step=config.step;input.autocomplete='off';input.id='recordFieldValue';
  $('recordFieldLabel').append(input);$('recordFieldError').textContent='';
  $('recordFieldSave').onclick=()=>{
@@ -620,4 +620,10 @@ document.addEventListener('click',e=>{if(!e.target.closest('.custom-select')&&!e
  #dateModal .clockUnit input{flex-basis:30px!important;width:30px!important;min-width:28px!important;height:36px!important;font-size:15px!important}
  #dateModal .clockUnit small{font-size:8px!important}
 }
+</style><style>
+/* 总优惠随总消费显示；将总消费本身固定在页脚最右端 */
+#ledgerMain .ledgerFooter #mCountFoot{order:3!important;margin-left:auto!important}
+#ledgerMain .ledgerFooter span:has(#mCatCountFoot){order:2!important;margin-left:0!important}
+#ledgerMain .ledgerFooter span:has(#mTotalFoot){order:4!important;margin-left:0!important}
+#ledgerMain .ledgerFooter .footerExport{order:1!important}
 </style></body></html>
