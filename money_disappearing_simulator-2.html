@@ -350,14 +350,16 @@ function render(){renderBookSelect();let rows=filtered(),total=rows.reduce((a,r)
   if(e.pointerType!=='touch'&&e.pointerType!=='pen')return;
   let handle=e.target.closest('.itemDragHandle,.categoryDrag'),item=e.target.closest('.mRecord'),group=e.target.closest('.categoryGroup');
   if(!handle||(!item&&!group))return;
-  drag=item?{kind:'item',id:item.dataset.recordId,el:item,pointerId:e.pointerId}:{kind:'category',category:group.dataset.category,el:group,pointerId:e.pointerId};
+  if(handle.classList.contains('itemDragHandle')&&item)drag={kind:'item',id:item.dataset.recordId,el:item,pointerId:e.pointerId};
+  else if(handle.classList.contains('categoryDrag')&&group)drag={kind:'category',category:group.dataset.category,el:group,pointerId:e.pointerId};
+  else return;
   drag.el.classList.add('dragging');e.preventDefault();
  },{passive:false});
  document.addEventListener('pointermove',e=>{
   if(!drag||e.pointerId!==drag.pointerId)return;e.preventDefault();
-  let target=document.elementFromPoint(e.clientX,e.clientY),item=target?.closest('.mRecord'),group=target?.closest('.categoryGroup');
+  let target=document.elementFromPoint(e.clientX,e.clientY),item=target?.closest('.mRecord'),head=target?.closest('.categoryGroupHead'),group=head?.closest('.categoryGroup');
   if(over)over.classList.remove('drag-over');
-  over=drag.kind==='item'?(item||group):group;
+  over=drag.kind==='item'?item:(group&&head?group:null);
   if(over&&over!==drag.el)over.classList.add('drag-over');
  },{passive:false});
  document.addEventListener('pointerup',e=>{
@@ -369,14 +371,11 @@ function render(){renderBookSelect();let rows=filtered(),total=rows.reduce((a,r)
   }
   let records=current().records,moving=records.find(x=>x.id===source.id);if(!moving)return;
   let targetItem=target.closest('.mRecord'),targetGroup=target.closest('.categoryGroup');
-  if(targetItem){
-   let targetId=targetItem.dataset.recordId,to=records.findIndex(x=>x.id===targetId),from=records.findIndex(x=>x.id===source.id);
-   if(to<0||from<0||to===from)return;
-   moving.category=targetGroup?.dataset.category||targetItem.closest('.categoryGroup').dataset.category;
-   records.splice(from,1);to=records.findIndex(x=>x.id===targetId);records.splice(to,0,moving);
-  }else if(targetGroup){
-   moving.category=targetGroup.dataset.category;records.splice(records.indexOf(moving),1);let last=records.reduce((n,r,i)=>r.category===moving.category?i:n,-1);records.splice(last+1,0,moving);
-  }
+  if(!targetItem)return;
+  let targetId=targetItem.dataset.recordId,to=records.findIndex(x=>x.id===targetId),from=records.findIndex(x=>x.id===source.id);
+  if(to<0||from<0||to===from)return;
+  moving.category=targetItem.closest('.categoryGroup').dataset.category;
+  records.splice(from,1);to=records.findIndex(x=>x.id===targetId);records.splice(to,0,moving);
   save();render();
  },{passive:false});
  document.addEventListener('pointercancel',e=>{if(drag&&e.pointerId===drag.pointerId)clear()});
@@ -388,14 +387,11 @@ function render(){renderBookSelect();let rows=filtered(),total=rows.reduce((a,r)
   let group=document.createElement('section');group.className='categoryGroup';group.dataset.category=category;
   if(actions){
    group.draggable=true;
-   group.addEventListener('dragstart',e=>{if(e.target.closest('.mRecord'))return;e.dataTransfer.setData('text/plain',JSON.stringify({kind:'category',category}));e.dataTransfer.effectAllowed='move';group.classList.add('dragging')});
+   group.addEventListener('dragstart',e=>{if(!e.target.closest('.categoryDrag')){e.preventDefault();return}e.dataTransfer.setData('text/plain',JSON.stringify({kind:'category',category}));e.dataTransfer.effectAllowed='move';group.classList.add('dragging')});
    group.addEventListener('dragend',()=>group.classList.remove('dragging'));
-   group.addEventListener('dragover',e=>{e.preventDefault();group.classList.add('drag-over')});
-   group.addEventListener('dragleave',()=>group.classList.remove('drag-over'));
-   group.addEventListener('drop',e=>{e.preventDefault();group.classList.remove('drag-over');let data;try{data=JSON.parse(e.dataTransfer.getData('text/plain'))}catch(_){return}
-    if(data.kind==='category'){let from=categories.indexOf(data.category),to=categories.indexOf(category);if(from>=0&&to>=0&&from!==to){let moved=categories.splice(from,1)[0];categories.splice(to,0,moved);saveCats();render()}}
-    else if(data.kind==='item'){let rec=current().records.find(x=>x.id===data.id);if(rec&&rec.category!==category){rec.category=category;save();render()}}
-   });
+   group.addEventListener('dragover',e=>{let data;try{data=JSON.parse(e.dataTransfer.getData('text/plain'))}catch(_){return}if(data.kind!=='category'||!e.target.closest('.categoryGroupHead'))return;e.preventDefault();group.classList.add('drag-over')});
+   group.addEventListener('dragleave',e=>{if(!group.contains(e.relatedTarget))group.classList.remove('drag-over')});
+   group.addEventListener('drop',e=>{let data;try{data=JSON.parse(e.dataTransfer.getData('text/plain'))}catch(_){return}if(data.kind!=='category'||!e.target.closest('.categoryGroupHead'))return;e.preventDefault();group.classList.remove('drag-over');let from=categories.indexOf(data.category),to=categories.indexOf(category);if(from>=0&&to>=0&&from!==to){let moved=categories.splice(from,1)[0];categories.splice(to,0,moved);saveCats();render()}});
   }
   let sum=items.reduce((a,r)=>a+r.amount,0);
   group.innerHTML='<div class="categoryGroupHead"><span class="categoryDrag dragHandle" aria-label="拖动类别">⠿</span><span>'+esc(category)+'</span><strong>'+fmt(sum)+'</strong></div>';
@@ -447,10 +443,10 @@ function customSelect(sel){
  t.onclick=()=>{
   let wasOpen=wrap.classList.contains('open');closeAllMenus();if(wasOpen)return;
   wrap.classList.add('open');m.classList.add('open');
-  let viewport=Math.min(document.documentElement.clientWidth||innerWidth,innerWidth),r=t.getBoundingClientRect(),width=Math.min(Math.max(r.width,180),viewport-16);
-  m.style.position='fixed';m.style.width=width+'px';m.style.maxWidth=(viewport-16)+'px';m.style.right='auto';
-  const position=()=>{if(!wrap.classList.contains('open'))return;let b=t.getBoundingClientRect(),mw=Math.min(m.offsetWidth,viewport-16),left=Math.max(8,Math.min(b.left,viewport-mw-8)),height=m.offsetHeight,top=(innerHeight-b.bottom>height+8?b.bottom+4:Math.max(8,b.top-height-4));m.style.left=left+'px';m.style.top=Math.max(8,Math.min(top,innerHeight-height-8))+'px'};
-  position();m._position=position;window.addEventListener('scroll',position,true);window.addEventListener('resize',position);
+  const viewportBox=()=>{let v=window.visualViewport;return {left:v?v.offsetLeft:0,top:v?v.offsetTop:0,width:v?v.width:document.documentElement.clientWidth,height:v?v.height:innerHeight}};
+  m.style.position='fixed';m.style.boxSizing='border-box';m.style.overflowY='auto';m.style.overflowX='hidden';
+  const position=()=>{if(!wrap.classList.contains('open'))return;let v=viewportBox(),b=t.getBoundingClientRect(),width=Math.max(1,Math.min(b.width,v.width-16)),maxH=Math.max(80,v.height-16);m.style.width=width+'px';m.style.minWidth='0';m.style.maxWidth=(v.width-16)+'px';m.style.maxHeight=maxH+'px';let height=Math.min(m.scrollHeight,maxH),left=Math.max(v.left+8,Math.min(b.left,v.left+v.width-width-8)),below=v.top+v.height-b.bottom-8,above=b.top-v.top-8,top=below>=Math.min(height,160)||below>=above?b.bottom+4:b.top-height-4;top=Math.max(v.top+8,Math.min(top,v.top+v.height-height-8));m.style.left=left+'px';m.style.top=top+'px'};
+  position();m._position=position;window.addEventListener('scroll',position,true);window.addEventListener('resize',position);if(window.visualViewport){visualViewport.addEventListener('resize',position);visualViewport.addEventListener('scroll',position)}
  };
  sel.addEventListener('change',sync);wrap._sync=sync;sync();
 }function syncCustom(){document.querySelectorAll('.custom-select').forEach(w=>{let s=$(w.dataset.for);if(s)w._sync()})}
