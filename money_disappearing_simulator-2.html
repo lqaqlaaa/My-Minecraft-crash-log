@@ -347,36 +347,28 @@ function render(){renderBookSelect();let rows=filtered(),total=rows.reduce((a,r)
  if(list.dataset.touchSort)return;list.dataset.touchSort='1';let drag=null,over=null,longPress=null;
  const clear=()=>{if(longPress)clearTimeout(longPress);longPress=null;if(drag?.el)drag.el.classList.remove('dragging');if(over)over.classList.remove('drag-over');drag=null;over=null};
  const setTarget=(x,y)=>{let node=document.elementFromPoint(x,y),item=node?.closest('.mRecord'),head=node?.closest('.categoryGroupHead'),group=head?.closest('.categoryGroup');if(over)over.classList.remove('drag-over');over=drag?.kind==='item'?item:(group&&head?group:null);if(over&&over!==drag.el)over.classList.add('drag-over')};
+ const finish=()=>{let source=drag,target=over,active=source?.active;clear();if(!active||!target||target===source.el)return;if(source.kind==='category'){let targetGroup=target.closest('.categoryGroup'),to=targetGroup?categories.indexOf(targetGroup.dataset.category):-1,from=categories.indexOf(source.category);if(from>=0&&to>=0&&from!==to){let moved=categories.splice(from,1)[0];categories.splice(to,0,moved);saveCats();render()}return}let targetItem=target.closest('.mRecord');if(targetItem)swapRecordSlots('mRecords',source.id,targetItem.dataset.recordId)};
  list.addEventListener('pointerdown',e=>{
-  if(e.button!==undefined&&e.button!==0)return;
+  if(e.pointerType==='touch'||(e.button!==undefined&&e.button!==0))return;
   let item=e.target.closest('.mRecord'),group=e.target.closest('.categoryGroup'),categoryHandle=e.target.closest('.categoryDrag');
-  if(item){
-   drag={kind:'item',id:item.dataset.recordId,el:item,pointerId:e.pointerId,startX:e.clientX,startY:e.clientY,active:false,pointerType:e.pointerType};
-   if(e.pointerType==='touch'||e.pointerType==='pen')longPress=setTimeout(()=>{longPress=null;if(drag&&drag.pointerId===e.pointerId){drag.active=true;drag.el.classList.add('dragging');setTarget(drag.startX,drag.startY)}},230);
-   return;
-  }
-  if(categoryHandle&&group&&(e.pointerType==='touch'||e.pointerType==='pen')){drag={kind:'category',category:group.dataset.category,el:group,pointerId:e.pointerId,startX:e.clientX,startY:e.clientY,active:false,pointerType:e.pointerType};longPress=setTimeout(()=>{longPress=null;if(drag&&drag.pointerId===e.pointerId){drag.active=true;drag.el.classList.add('dragging')}},230);return}
+  if(item){drag={kind:'item',id:item.dataset.recordId,el:item,pointerId:e.pointerId,startX:e.clientX,startY:e.clientY,active:false,pointerType:e.pointerType};if(e.pointerType==='pen')longPress=setTimeout(()=>{longPress=null;if(drag&&drag.pointerId===e.pointerId){drag.active=true;drag.el.classList.add('dragging')}},230);return}
+  if(categoryHandle&&group&&e.pointerType==='pen'){drag={kind:'category',category:group.dataset.category,el:group,pointerId:e.pointerId,startX:e.clientX,startY:e.clientY,active:false,pointerType:e.pointerType};longPress=setTimeout(()=>{longPress=null;if(drag&&drag.pointerId===e.pointerId){drag.active=true;drag.el.classList.add('dragging')}},230)}
  },{passive:true});
- document.addEventListener('pointermove',e=>{
-  if(!drag||e.pointerId!==drag.pointerId)return;
-  let dx=e.clientX-drag.startX,dy=e.clientY-drag.startY,distance=Math.hypot(dx,dy);
-  if(!drag.active){
-   if(drag.pointerType==='touch'||drag.pointerType==='pen'){if(distance>10&&longPress){clear();return}else if(distance>10&&!drag.active){clear();return}}
-   else if(distance>5){drag.active=true;drag.el.classList.add('dragging')}
-  }
-  if(!drag.active)return;
-  e.preventDefault();setTarget(e.clientX,e.clientY);
+ document.addEventListener('pointermove',e=>{if(!drag||drag.pointerType==='touch'||e.pointerId!==drag.pointerId)return;let distance=Math.hypot(e.clientX-drag.startX,e.clientY-drag.startY);if(!drag.active){if(drag.pointerType==='pen'){if(distance>10&&longPress){clear();return}}else if(distance>5){drag.active=true;drag.el.classList.add('dragging')}}if(!drag.active)return;e.preventDefault();setTarget(e.clientX,e.clientY)},{passive:false});
+ document.addEventListener('pointerup',e=>{if(drag&&drag.pointerType!=='touch'&&e.pointerId===drag.pointerId)finish()},{passive:true});
+ document.addEventListener('pointercancel',e=>{if(drag&&drag.pointerType!=='touch'&&e.pointerId===drag.pointerId)clear()});
+ list.addEventListener('touchstart',e=>{
+  if(drag||!e.changedTouches.length)return;let t=e.changedTouches[0],item=e.target.closest('.mRecord'),group=e.target.closest('.categoryGroup'),categoryHandle=e.target.closest('.categoryDrag');
+  if(item)drag={kind:'item',id:item.dataset.recordId,el:item,startX:t.clientX,startY:t.clientY,touchId:t.identifier,active:false,pointerType:'touch'};
+  else if(categoryHandle&&group)drag={kind:'category',category:group.dataset.category,el:group,startX:t.clientX,startY:t.clientY,touchId:t.identifier,active:false,pointerType:'touch'};
+  if(drag)longPress=setTimeout(()=>{longPress=null;if(drag?.pointerType==='touch'){drag.active=true;drag.el.classList.add('dragging');setTarget(drag.startX,drag.startY)}},230);
+ },{passive:true});
+ list.addEventListener('touchmove',e=>{
+  if(!drag||drag.pointerType!=='touch')return;let t=[...e.changedTouches].find(x=>x.identifier===drag.touchId);if(!t)return;let distance=Math.hypot(t.clientX-drag.startX,t.clientY-drag.startY);
+  if(!drag.active){if(distance>9)clear();return}e.preventDefault();setTarget(t.clientX,t.clientY);
  },{passive:false});
- document.addEventListener('pointerup',e=>{
-  if(!drag||e.pointerId!==drag.pointerId)return;
-  let source=drag,target=over,active=source.active;clear();if(!active||!target||target===source.el)return;
-  if(source.kind==='category'){
-   let targetGroup=target.closest('.categoryGroup'),to=targetGroup?categories.indexOf(targetGroup.dataset.category):-1,from=categories.indexOf(source.category);
-   if(from>=0&&to>=0&&from!==to){let moved=categories.splice(from,1)[0];categories.splice(to,0,moved);saveCats();render()}return;
-  }
-  let targetItem=target.closest('.mRecord');if(targetItem)swapRecordSlots('mRecords',source.id,targetItem.dataset.recordId);
- },{passive:false});
- document.addEventListener('pointercancel',e=>{if(drag&&e.pointerId===drag.pointerId)clear()});
+ list.addEventListener('touchend',e=>{if(!drag||drag.pointerType!=='touch')return;if(![...e.changedTouches].some(x=>x.identifier===drag.touchId))return;finish()},{passive:true});
+ list.addEventListener('touchcancel',()=>{if(drag?.pointerType==='touch')clear()},{passive:true});
 }function renderRecords(target,rows,actions){
  let list=$(target);if(!list)return;if(actions)enableTouchSort(list);list.innerHTML='';
  if(!rows.length){list.innerHTML='<div class="empty">当前账单没有消费记录</div>';return}
@@ -640,7 +632,7 @@ document.addEventListener('click',e=>{if(!e.target.closest('.custom-select')&&!e
 #ledgerMain .mRecord .priceTop:has(.originalPriceLine):not(:has(.priceMeta)){gap:0!important}
 </style><style>
 /* 触屏整行长按拖动；普通滑动仍由页面滚动手势接管 */
-#ledgerMain .mRecord{touch-action:none!important}
+#ledgerMain .mRecord{touch-action:pan-y!important}
 #ledgerMain .mRecord button{touch-action:manipulation!important}
 #ledgerMain .mRecord.dragging{will-change:transform,opacity,box-shadow}
 #ledgerMain .mRecord.drag-over{transition:transform .12s ease,background-color .12s ease,outline-color .12s ease!important}
