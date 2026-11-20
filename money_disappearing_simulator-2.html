@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#111827">
+<title>你的钱是如何快速消失的？</title>
+<style>
+:root{color-scheme:dark;--bg:#0b1020;--panel:#131b2e;--panel2:#1b2640;--line:#2b3855;--text:#f4f7ff;--muted:#9ba9c4;--green:#53e0a0;--red:#ff7188;--gold:#ffd166;--blue:#7da7ff}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 15% 0%,#1c2b4b 0,transparent 42%),radial-gradient(ellipse at 90% 15%,#352044 0,transparent 35%),var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;padding:28px 16px 50px}
+.wrap{width:min(980px,100%);margin:auto}.hero{text-align:center;margin:10px 0 28px}.eyebrow{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border:1px solid #59465d;background:#291e35;border-radius:99px;color:#ffc5d0;font-size:12px;letter-spacing:.08em}.hero h1{font-size:clamp(30px,6vw,54px);line-height:1.12;margin:16px 0 10px;letter-spacing:-.04em}.hero h1 span{color:var(--gold)}.hero p{color:var(--muted);margin:0;font-size:15px}
+.layout{display:grid;grid-template-columns:330px 1fr;gap:18px;align-items:start}.panel{background:linear-gradient(160deg,rgba(25,36,60,.97),rgba(17,25,43,.97));border:1px solid var(--line);border-radius:20px;padding:22px;box-shadow:0 18px 55px #0003}.panel h2{font-size:17px;margin:0 0 18px}.field{margin:15px 0}.field label{display:block;color:var(--muted);font-size:13px;margin-bottom:8px}.input-wrap{display:flex;align-items:center;background:#0c1426;border:1px solid #354361;border-radius:12px;padding:0 13px}.input-wrap b{font-size:20px;color:var(--muted)}input{width:100%;min-width:0;background:transparent;border:0;outline:0;color:var(--text);font-size:22px;padding:13px 9px;font-weight:650}input:focus-visible{outline:2px solid var(--blue);outline-offset:3px;border-radius:6px}.hint{font-size:11px;color:var(--muted);margin-top:7px}button{font:inherit;cursor:pointer;border:0;border-radius:12px;padding:12px 15px;font-weight:700;transition:transform .15s,filter .15s}button:hover{filter:brightness(1.1);transform:translateY(-1px)}button:active{transform:translateY(0)}button:disabled{opacity:.45;cursor:not-allowed;transform:none}.primary{width:100%;background:linear-gradient(100deg,#6f8fff,#9c79ff);color:white;margin-top:9px}.secondary{background:#24334f;color:#e5edff;border:1px solid #3c4c6d}.collect{background:linear-gradient(100deg,#ed9b42,#e65c7b);color:#241323}.error{color:var(--red);font-size:12px;min-height:18px;margin-top:8px}
+.results{display:flex;flex-direction:column;gap:16px}.summary{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:10px}.stat{background:#0d1629;border:1px solid var(--line);border-radius:14px;padding:14px}.stat small{display:block;color:var(--muted);font-size:11px;margin-bottom:7px}.stat strong{font-size:clamp(17px,3vw,25px);font-variant-numeric:tabular-nums}.stat.total strong{color:var(--green)}
+.result-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}.result-head h2{margin:0;font-size:17px}.count{font-size:12px;color:var(--muted)}.amounts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;max-height:320px;overflow:auto;padding-right:4px}.amount{background:#0d1629;border:1px solid #293753;border-radius:10px;padding:10px 8px;text-align:center;animation:pop .25s ease both}.amount small{display:block;color:#8292b1;font-size:10px;margin-bottom:4px}.amount b{font-size:14px;font-variant-numeric:tabular-nums}.amount:nth-child(5n){border-color:#594b37}.empty{color:var(--muted);text-align:center;padding:48px 12px;border:1px dashed #3b4966;border-radius:14px;grid-column:1/-1}
+@keyframes pop{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.collector{border:1px solid #614b3e;background:linear-gradient(145deg,#2a2030,#1c2033);border-radius:17px;padding:18px;display:none}.collector.show{display:block;animation:pop .35s ease}.collector-top{display:flex;align-items:center;justify-content:space-between;gap:10px}.collector h2{margin:0;font-size:16px}.live-total{font-size:clamp(28px,5vw,42px);font-weight:800;color:var(--gold);font-variant-numeric:tabular-nums;margin:13px 0 4px}.live-label{font-size:12px;color:#c5b5c7}.progress{height:9px;background:#49384b;border-radius:99px;overflow:hidden;margin:15px 0 8px}.bar{height:100%;width:0;background:linear-gradient(90deg,#ffc15c,#ff7188);border-radius:99px;transition:width .12s linear}.collect-status{display:flex;justify-content:space-between;color:#c5b5c7;font-size:12px}.current{margin-top:14px;background:#171a2b;border:1px solid #59435a;border-radius:11px;padding:12px;display:flex;justify-content:space-between;align-items:center}.current span{color:var(--muted);font-size:12px}.current strong{color:#ffcf85;font-size:18px;font-variant-numeric:tabular-nums}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}.foot{text-align:center;color:#71809e;font-size:11px;margin:20px 0 0}
+@media(max-width:760px){.layout{grid-template-columns:1fr}.summary{grid-template-columns:1fr 1fr}.stat.total{grid-column:1/-1}.amounts{grid-template-columns:repeat(3,minmax(0,1fr))}.panel{padding:18px}}
+@media(max-width:390px){.amounts{grid-template-columns:repeat(2,minmax(0,1fr))}.summary{gap:7px}.stat{padding:11px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <div class="eyebrow">💸 零碎金额累积实验</div>
+    <h1>你的钱是如何<span>快速消失</span>的？</h1>
+    <p>每一笔看起来都不多，全部加起来却可能很惊人。</p>
+  </header>
+  <main class="layout">
+    <section class="panel">
+      <h2>⚙️ 设置金额</h2>
+      <div class="field">
+        <label for="total">总金额（元）</label>
+        <div class="input-wrap"><b>¥</b><input id="total" type="number" min="0.01" step="0.01" placeholder="例如：1000.00" inputmode="decimal"></div>
+      </div>
+      <div class="field">
+        <label for="parts">随机分成多少份</label>
+        <div class="input-wrap"><input id="parts" type="number" min="1" max="10000" step="1" placeholder="例如：100" inputmode="numeric"><b style="font-size:13px">份</b></div>
+        <div class="hint">每份金额随机生成，最低 ¥0.01；总份数不能超过总金额的分数。</div>
+      </div>
+      <button class="primary" id="generate">🎲 随机拆分金额</button>
+      <div class="error" id="error" role="alert"></div>
+    </section>
+    <section class="results">
+      <section class="panel">
+        <div class="summary">
+          <div class="stat total"><small>所有小余额合计</small><strong id="sum">¥0.00</strong></div>
+          <div class="stat"><small>最小一笔</small><strong id="min">—</strong></div>
+          <div class="stat"><small>最大一笔</small><strong id="max">—</strong></div>
+        </div>
+      </section>
+      <section class="panel">
+        <div class="result-head"><h2>🧾 随机金额明细</h2><span class="count" id="count">等待生成</span></div>
+        <div class="amounts" id="amounts"><div class="empty">先输入总金额和份数，点击「随机拆分金额」</div></div>
+        <button class="collect" id="showProcess" style="width:100%;margin-top:16px" disabled>🪙 展示所有小余额加起来的过程</button>
+      </section>
+      <button class="collect" id="showProcess" disabled>🪙 展示所有小余额加起来的过程</button>
+      <section class="collector" id="collector" aria-live="polite">
+        <div class="collector-top"><h2>🪙 正在把零碎余额一笔笔加起来</h2><span class="count" id="collectCount">0 / 0</span></div>
+        <div class="live-total" id="liveTotal">¥0.00</div>
+        <div class="live-label">已经累计的金额</div>
+        <div class="progress"><div class="bar" id="bar"></div></div>
+        <div class="collect-status"><span id="progressText">准备开始</span><span id="percent">0%</span></div>
+        <div class="current"><span id="currentLabel">等待第一笔小余额</span><strong id="currentAmount">+¥0.00</strong></div>
+        <div class="actions">
+          <button class="secondary" id="pause" disabled>⏸ 暂停</button>
+          <button class="secondary" id="skip" disabled>⏭ 直接汇总</button>
+          <button class="secondary" id="again" disabled>↻ 重新播放</button>
+        </div>
+      </section>
+    </section>
+  </main>
+  <p class="foot">金额以“分”为单位进行整数运算 · 每份不少于 ¥0.01 · 汇总结果与输入总金额精确一致</p>
+</div>
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  let values = [], timer = null, index = 0, running = false, paused = false, sum = 0;
+  const money = cents => '¥' + (cents / 100).toLocaleString('zh-CN',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const randomInt = max => {
+    if (max <= 0) return 0;
+    if (window.crypto && crypto.getRandomValues) {
+      const range = 0x100000000, limit = range - range % max;
+      const a = new Uint32Array(1); let n;
+      do { crypto.getRandomValues(a); n = a[0]; } while (n >= limit);
+      return n % max;
+    }
+    return Math.floor(Math.random() * max);
+  };
+  function renderAmounts() {
+    $('amounts').innerHTML = '';
+    const frag = document.createDocumentFragment();
+    values.forEach((v,i) => {
+      const el = document.createElement('div'); el.className='amount';
+      const small = document.createElement('small'); small.textContent = `第 ${i+1} 份`;
+      const b = document.createElement('b'); b.textContent = money(v);
+      el.append(small,b); frag.append(el);
+    });
+    $('amounts').append(frag);
+    $('count').textContent = `${values.length.toLocaleString()} 份随机余额`;
+    $('sum').textContent = money(values.reduce((a,b)=>a+b,0));
+    $('min').textContent = money(Math.min(...values));
+    $('max').textContent = money(Math.max(...values));
+  }
+  function resetCollector() {
+    clearInterval(timer); timer=null; index=0; sum=0; running=false; paused=false;
+    $('collector').classList.remove('show'); $('showProcess').disabled=true;
+    $('liveTotal').textContent=money(0); $('collectCount').textContent=`0 / ${values.length}`;
+    $('bar').style.width='0%'; $('progressText').textContent='准备开始'; $('percent').textContent='0%';
+    $('currentLabel').textContent='等待第一笔小余额'; $('currentAmount').textContent='+¥0.00';
+    $('pause').disabled=true; $('pause').textContent='⏸ 暂停'; $('skip').disabled=true; $('again').disabled=true;
+  }
+  function generate() {
+    $('error').textContent='';
+    const raw=$('total').value.trim(), count=Number($('parts').value);
+    if (!raw || !Number.isFinite(Number(raw)) || !/^\d+(\.\d{1,2})?$/.test(raw) || Number(raw)<=0) {
+      $('error').textContent='请输入大于 0 且最多包含两位小数的总金额。'; return;
+    }
+    const cents=Math.round(Number(raw)*100);
+    if (!Number.isSafeInteger(cents) || cents<1) {$('error').textContent='金额超出可处理范围。';return;}
+    if (!Number.isInteger(count) || count<1 || count>10000 || count>cents) {
+      $('error').textContent='份数须为 1–10,000 的整数，并且不能超过总金额的分数（每份至少 0.01 元）。';return;
+    }
+    // 在总金额的分数位置中抽取 count-1 个不同切点，得到严格为正的随机分配。
+    const cuts=[];
+    if (count>1) {
+      // 部分 Fisher–Yates：从 [1, cents-1] 中无放回抽样。
+      const pool=Array.from({length:cents-1},(_,i)=>i+1);
+      for(let i=0;i<count-1;i++){const j=i+randomInt(pool.length-i);[pool[i],pool[j]]=[pool[j],pool[i]];cuts.push(pool[i]);}
+      cuts.sort((a,b)=>a-b);
+    }
+    values=[]; let prev=0;
+    for(const cut of cuts){values.push(cut-prev);prev=cut;}
+    values.push(cents-prev);
+    // 随机打乱份数顺序。
+    for(let i=values.length-1;i>0;i--){const j=randomInt(i+1);[values[i],values[j]]=[values[j],values[i]];}
+    renderAmounts(); resetCollector(); $('showProcess').disabled=false; $('showProcess').textContent='🪙 展示所有小余额加起来的过程'; $('showProcess').disabled=false;
+  }
+  function updateProgress() {
+    $('liveTotal').textContent=money(sum);
+    $('collectCount').textContent=`${index} / ${values.length}`;
+    const p=values.length ? index/values.length*100 : 0;
+    $('bar').style.width=p+'%'; $('percent').textContent=Math.floor(p)+'%';
+    $('progressText').textContent=index===values.length?'全部小余额已汇总！':`已累加 ${index} 笔`;
+  }
+  function finish() {
+    clearInterval(timer);timer=null;index=values.length;sum=values.reduce((a,b)=>a+b,0);
+    $('liveTotal').textContent=money(sum);$('currentLabel').textContent='🎉 汇总完成';$('currentAmount').textContent='+'+money(values[values.length-1]||0);
+    updateProgress();running=false;paused=false;
+    $('pause').disabled=true;$('skip').disabled=true;$('again').disabled=false;
+  }
+  function tick() {
+    if(index>=values.length){finish();return;}
+    const v=values[index];sum+=v;index++;
+    $('currentLabel').textContent=`第 ${index} 笔小余额加入`;
+    $('currentAmount').textContent='+'+money(v);
+    updateProgress();
+    if(index>=values.length)finish();
+  }
+  function play() {
+    if(!values.length)return;
+    clearInterval(timer);$('collector').classList.add('show');
+    if(index>=values.length){index=0;sum=0;updateProgress();}
+    running=true;paused=false;$('pause').disabled=false;$('pause').textContent='⏸ 暂停';$('skip').disabled=false;$('again').disabled=true;
+    tick(); if(index<values.length)timer=setInterval(tick,Math.max(35,Math.min(180,18000/values.length)));
+  }
+  $('total').addEventListener('input',()=>{$('showProcess').disabled=true;});
+  $('parts').addEventListener('input',()=>{$('showProcess').disabled=true;});
+  $('generate').addEventListener('click',generate);
+  $('showProcess').addEventListener('click',()=>{ $('collector').classList.add('show'); play(); });
+  $('showProcess').addEventListener('click',()=>{ index=0; sum=0; updateProgress(); $('currentLabel').textContent='开始汇总零碎余额'; $('currentAmount').textContent='+¥0.00'; play(); });
+  $('pause').addEventListener('click',()=>{
+    if(!running&&!paused)return;
+    if(!paused){clearInterval(timer);timer=null;paused=true;running=false;$('pause').textContent='▶ 继续';}
+    else{paused=false;running=true;$('pause').textContent='⏸ 暂停';timer=setInterval(tick,Math.max(35,Math.min(180,18000/values.length)));}
+  });
+  $('skip').addEventListener('click',finish);
+  $('again').addEventListener('click',()=>{index=0;sum=0;updateProgress();$('currentLabel').textContent='重新开始汇总';$('currentAmount').textContent='+¥0.00';play();});
+})();
+</script>
+</body>
+</html>
