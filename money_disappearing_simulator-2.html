@@ -346,37 +346,29 @@ function periodKey(r,p){let d=new Date(r.date),y=d.getFullYear(),m=String(d.getM
 function render(){renderBookSelect();let rows=filtered(),total=rows.reduce((a,r)=>a+r.amount,0),discountTotal=rows.reduce((a,r)=>a+(Number.isSafeInteger(r.discount)?r.discount:0),0),cats={};rows.forEach(r=>cats[r.category||'未分类']=(cats[r.category||'未分类']||0)+r.amount);$('mTotalFoot').textContent=fmt(total)+'（总优惠：'+fmt(discountTotal)+'）';$('mCatCountFoot').textContent=Object.keys(cats).length+' 类';$('mCountFoot').textContent=rows.length+' 笔消费';renderRecords('mRecords',rows,true);renderRecords('viewerRecords',rows,false);renderRanking(rows,cats)}function enableTouchSort(list){
  if(list.dataset.touchSort)return;list.dataset.touchSort='1';let drag=null,over=null,longPress=null;
  const clear=()=>{if(longPress)clearTimeout(longPress);longPress=null;if(drag?.el)drag.el.classList.remove('dragging');if(over)over.classList.remove('drag-over');drag=null;over=null};
- const setTarget=(x,y)=>{let node=document.elementFromPoint(x,y),item=node?.closest('.mRecord'),head=node?.closest('.categoryGroupHead'),group=head?.closest('.categoryGroup');if(over)over.classList.remove('drag-over');over=drag?.kind==='item'?item:(group&&head?group:null);if(over&&over!==drag.el)over.classList.add('drag-over')};
- const finish=()=>{let source=drag,target=over,active=source?.active;clear();if(!active||!target||target===source.el)return;if(source.kind==='category'){let targetGroup=target.closest('.categoryGroup'),to=targetGroup?categories.indexOf(targetGroup.dataset.category):-1,from=categories.indexOf(source.category);if(from>=0&&to>=0&&from!==to){let moved=categories.splice(from,1)[0];categories.splice(to,0,moved);saveCats();render()}return}let targetItem=target.closest('.mRecord');if(targetItem)swapRecordSlots('mRecords',source.id,targetItem.dataset.recordId)};
- list.addEventListener('pointerdown',e=>{
-  if(e.pointerType==='touch'||(e.button!==undefined&&e.button!==0))return;
-  let item=e.target.closest('.mRecord'),group=e.target.closest('.categoryGroup'),categoryHandle=e.target.closest('.categoryDrag');
-  if(item){drag={kind:'item',id:item.dataset.recordId,el:item,pointerId:e.pointerId,startX:e.clientX,startY:e.clientY,active:false,pointerType:e.pointerType};if(e.pointerType==='pen')longPress=setTimeout(()=>{longPress=null;if(drag&&drag.pointerId===e.pointerId){drag.active=true;drag.el.classList.add('dragging')}},230);return}
-  if(categoryHandle&&group&&e.pointerType==='pen'){drag={kind:'category',category:group.dataset.category,el:group,pointerId:e.pointerId,startX:e.clientX,startY:e.clientY,active:false,pointerType:e.pointerType};longPress=setTimeout(()=>{longPress=null;if(drag&&drag.pointerId===e.pointerId){drag.active=true;drag.el.classList.add('dragging')}},230)}
- },{passive:true});
- document.addEventListener('pointermove',e=>{if(!drag||drag.pointerType==='touch'||e.pointerId!==drag.pointerId)return;let distance=Math.hypot(e.clientX-drag.startX,e.clientY-drag.startY);if(!drag.active){if(drag.pointerType==='pen'){if(distance>10&&longPress){clear();return}}else if(distance>5){drag.active=true;drag.el.classList.add('dragging')}}if(!drag.active)return;e.preventDefault();setTarget(e.clientX,e.clientY)},{passive:false});
+ const setTarget=(x,y)=>{let node=document.elementFromPoint(x,y),item=node?.closest('.mRecord'),group=node?.closest('.categoryGroup');if(over)over.classList.remove('drag-over');over=drag?.kind==='item'?item:group;if(over&&over!==drag.el)over.classList.add('drag-over')};
+ const animateCategoryOrder=before=>requestAnimationFrame(()=>{list.querySelectorAll('.categoryGroup').forEach(el=>{let old=before.get(el.dataset.category);if(!old)return;let now=el.getBoundingClientRect(),dx=old.left-now.left,dy=old.top-now.top;if(dx||dy)el.animate([{transform:'translate('+dx+'px,'+dy+'px)',opacity:.75},{transform:'translate(0,0)',opacity:1}],{duration:260,easing:'cubic-bezier(.2,.75,.25,1)'})})});
+ const finish=()=>{let source=drag,target=over,active=source?.active;clear();if(!active||!target||target===source.el)return;
+  if(source.kind==='category'){let targetGroup=target.closest('.categoryGroup'),to=targetGroup?categories.indexOf(targetGroup.dataset.category):-1,from=categories.indexOf(source.category);if(from>=0&&to>=0&&from!==to){let before=new Map();list.querySelectorAll('.categoryGroup').forEach(el=>before.set(el.dataset.category,el.getBoundingClientRect()));let moved=categories.splice(from,1)[0];categories.splice(to,0,moved);saveCats();render();animateCategoryOrder(before)}return}
+  let targetItem=target.closest('.mRecord');if(targetItem)swapRecordSlots('mRecords',source.id,targetItem.dataset.recordId)
+ };
+ list.addEventListener('pointerdown',e=>{if(e.pointerType==='touch'||(e.button!==undefined&&e.button!==0))return;let item=e.target.closest('.mRecord'),group=e.target.closest('.categoryGroup');if(item){drag={kind:'item',id:item.dataset.recordId,el:item,pointerId:e.pointerId,startX:e.clientX,startY:e.clientY,active:false,pointerType:e.pointerType};return}if(group)drag={kind:'category',category:group.dataset.category,el:group,pointerId:e.pointerId,startX:e.clientX,startY:e.clientY,active:false,pointerType:e.pointerType}},{passive:true});
+ document.addEventListener('pointermove',e=>{if(!drag||drag.pointerType==='touch'||e.pointerId!==drag.pointerId)return;let distance=Math.hypot(e.clientX-drag.startX,e.clientY-drag.startY);if(!drag.active&&distance>5){drag.active=true;drag.el.classList.add('dragging')}if(!drag.active)return;e.preventDefault();setTarget(e.clientX,e.clientY)},{passive:false});
  document.addEventListener('pointerup',e=>{if(drag&&drag.pointerType!=='touch'&&e.pointerId===drag.pointerId)finish()},{passive:true});
  document.addEventListener('pointercancel',e=>{if(drag&&drag.pointerType!=='touch'&&e.pointerId===drag.pointerId)clear()});
- list.addEventListener('touchstart',e=>{
-  if(drag||!e.changedTouches.length)return;let t=e.changedTouches[0],item=e.target.closest('.mRecord'),group=e.target.closest('.categoryGroup'),categoryHandle=e.target.closest('.categoryDrag');
-  if(item)drag={kind:'item',id:item.dataset.recordId,el:item,startX:t.clientX,startY:t.clientY,touchId:t.identifier,active:false,pointerType:'touch'};
-  else if(categoryHandle&&group)drag={kind:'category',category:group.dataset.category,el:group,startX:t.clientX,startY:t.clientY,touchId:t.identifier,active:false,pointerType:'touch'};
-  if(drag)longPress=setTimeout(()=>{longPress=null;if(drag?.pointerType==='touch'){drag.active=true;drag.el.classList.add('dragging');setTarget(drag.startX,drag.startY)}},230);
- },{passive:true});
- list.addEventListener('touchmove',e=>{
-  if(!drag||drag.pointerType!=='touch')return;let t=[...e.changedTouches].find(x=>x.identifier===drag.touchId);if(!t)return;let distance=Math.hypot(t.clientX-drag.startX,t.clientY-drag.startY);
-  if(!drag.active){if(distance>9)clear();return}e.preventDefault();setTarget(t.clientX,t.clientY);
- },{passive:false});
+ list.addEventListener('touchstart',e=>{if(drag||!e.changedTouches.length)return;let t=e.changedTouches[0],item=e.target.closest('.mRecord'),group=e.target.closest('.categoryGroup');if(item)drag={kind:'item',id:item.dataset.recordId,el:item,startX:t.clientX,startY:t.clientY,touchId:t.identifier,active:false,pointerType:'touch'};else if(group)drag={kind:'category',category:group.dataset.category,el:group,startX:t.clientX,startY:t.clientY,touchId:t.identifier,active:false,pointerType:'touch'};if(drag)longPress=setTimeout(()=>{longPress=null;if(drag?.pointerType==='touch'){drag.active=true;drag.el.classList.add('dragging');setTarget(drag.startX,drag.startY)}},230)},{passive:true});
+ list.addEventListener('touchmove',e=>{if(!drag||drag.pointerType!=='touch')return;let t=[...e.changedTouches].find(x=>x.identifier===drag.touchId);if(!t)return;let distance=Math.hypot(t.clientX-drag.startX,t.clientY-drag.startY);if(!drag.active){if(distance>9)clear();return}e.preventDefault();setTarget(t.clientX,t.clientY)},{passive:false});
  list.addEventListener('touchend',e=>{if(!drag||drag.pointerType!=='touch')return;if(![...e.changedTouches].some(x=>x.identifier===drag.touchId))return;finish()},{passive:true});
  list.addEventListener('touchcancel',()=>{if(drag?.pointerType==='touch')clear()},{passive:true});
-}function renderRecords(target,rows,actions){
+}
+function renderRecords(target,rows,actions){
  let list=$(target);if(!list)return;if(actions)enableTouchSort(list);list.innerHTML='';
  if(!rows.length){list.innerHTML='<div class="empty">当前账单没有消费记录</div>';return}
  let grouped={};categories.forEach(c=>{grouped[c]=[]});rows.forEach(r=>(grouped[r.category||'未分类']||(grouped[r.category||'未分类']=[])).push(r));
  Object.entries(grouped).filter(([,items])=>items.length).forEach(([category,items])=>{
   let group=document.createElement('section');group.className='categoryGroup';group.dataset.category=category;
   if(actions){
-   group.draggable=true;
+   group.draggable=false;
    group.addEventListener('dragstart',e=>{if(!e.target.closest('.categoryDrag')){e.preventDefault();return}e.dataTransfer.setData('text/plain',JSON.stringify({kind:'category',category}));e.dataTransfer.effectAllowed='move';group.classList.add('dragging')});
    group.addEventListener('dragend',()=>group.classList.remove('dragging'));
    group.addEventListener('dragover',e=>{let data;try{data=JSON.parse(e.dataTransfer.getData('text/plain'))}catch(_){return}if(data.kind!=='category'||!e.target.closest('.categoryGroupHead'))return;e.preventDefault();group.classList.add('drag-over')});
@@ -394,7 +386,7 @@ function render(){renderBookSelect();let rows=filtered(),total=rows.reduce((a,r)
    let discount=Number.isSafeInteger(r.discount)?r.discount:0,gross=Number.isSafeInteger(r.grossAmount)?r.grossAmount:r.amount+discount;
    let quantityText='('+q+(r.unitName?esc(r.unitName):'')+')';
    let unitMarkup=validUnit?'<button class="priceMeta" data-edit="unit">单价 '+fmt(computedUnit)+'</button>':'';
-   el.innerHTML='<span class="dragHandle itemDragHandle" aria-label="拖动物品">⠿</span><div class="recordInfo"><div class="nameLine"><button class="editLink itemName" data-edit="name">'+esc(r.item)+'</button><button class="quantityTag" data-edit="quantity">'+quantityText+'</button></div><button class="editLink recordMeta" data-edit="date">'+new Date(r.date).toLocaleString('zh-CN',{hour12:false})+'</button></div><div class="recordRight"><div class="priceTop">'+(validUnit?'<button class="priceMeta" data-edit="unit">单价 '+fmt(computedUnit)+'</button>':'')+'<div class="originalPriceLine"><button class="priceLink originalPrice" data-edit="gross">原价 '+fmt(gross)+'</button>'+(discount>0?'<button class="discountLink" data-edit="discount">优惠 -'+fmt(discount)+'</button>':'<button class="discountLink" data-edit="discount">添加优惠</button>')+'</div></div><div class="netPriceCenter"><span class="netPrice">'+fmt(r.amount)+'</span></div><div class="itemTools"><button data-act="cat">切换类别</button><button data-act="del">删除</button></div></div>';
+   el.innerHTML='<span class="dragHandle itemDragHandle" aria-label="拖动物品">⠿</span><div class="recordInfo"><div class="nameLine"><button class="editLink itemName" data-edit="name">'+esc(r.item)+'</button><button class="quantityTag" data-edit="quantity">'+quantityText+'</button></div><button class="editLink recordMeta" data-edit="date">'+new Date(r.date).toLocaleString('zh-CN',{hour12:false})+'</button></div><div class="recordRight"><div class="priceTop"><div class="originalPriceLine"><button class="priceLink originalPrice" data-edit="gross">原价 '+fmt(gross)+'</button>'+(discount>0?'<button class="discountLink" data-edit="discount">优惠 -'+fmt(discount)+'</button>':'<button class="discountLink" data-edit="discount">添加优惠</button>')+'</div>'+(validUnit?'<button class="priceMeta" data-edit="unit">单价 '+fmt(computedUnit)+'</button>':'')+'</div><div class="netPriceCenter"><span class="netPrice">'+fmt(r.amount)+'</span></div><div class="itemTools"><button data-act="cat">切换类别</button><button data-act="del">删除</button></div></div>';
    if(actions){el.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>openRecordFieldEdit(r.id,b.dataset.edit));el.querySelector('[data-act=cat]').onclick=()=>editCategory(r.id);el.querySelector('[data-act=del]').onclick=()=>confirmAction('delete',r.id,'删除这条消费记录？')}
    else{el.querySelector('.itemTools').remove();el.querySelector('.dragHandle').remove();el.querySelectorAll('[data-edit]').forEach(b=>{b.outerHTML='<span class="'+b.className+'">'+b.innerHTML+'</span>'})}
    group.append(el);
@@ -636,4 +628,29 @@ document.addEventListener('click',e=>{if(!e.target.closest('.custom-select')&&!e
 #ledgerMain .mRecord button{touch-action:manipulation!important}
 #ledgerMain .mRecord.dragging{will-change:transform,opacity,box-shadow}
 #ledgerMain .mRecord.drag-over{transition:transform .12s ease,background-color .12s ease,outline-color .12s ease!important}
+</style><style>
+/* 修复账单价格、操作按钮、页脚、工具网格及类别拖动 */
+#ledgerMain .mRecord>.recordRight{display:flex!important;flex-direction:column!important;align-items:flex-end!important;justify-content:flex-start!important;gap:5px!important;min-width:0!important;height:100%!important}
+#ledgerMain .mRecord .priceTop{display:flex!important;flex-direction:row!important;align-items:baseline!important;justify-content:flex-end!important;gap:7px!important;white-space:nowrap!important;width:100%!important}
+#ledgerMain .mRecord .originalPriceLine{display:flex!important;flex-direction:row!important;align-items:baseline!important;justify-content:flex-end!important;gap:5px!important;white-space:nowrap!important;order:0!important}
+#ledgerMain .mRecord .priceMeta{display:inline-flex!important;order:1!important;align-self:baseline!important;margin:0!important;white-space:nowrap!important}
+#ledgerMain .mRecord .netPriceCenter{display:flex!important;justify-content:flex-end!important;align-items:center!important;width:100%!important}
+#ledgerMain .mRecord .itemTools{display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:flex-end!important;align-self:flex-end!important;gap:2px!important;margin-top:auto!important;margin-left:auto!important;padding:0!important;width:auto!important}
+#ledgerMain .mRecord .itemTools button{display:inline-flex!important;flex:0 0 auto!important;margin:0!important;padding:1px 2px!important;white-space:nowrap!important}
+#ledgerMain .ledgerFooter{display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:12px!important;width:100%!important}
+#ledgerMain .ledgerFooter .footerExport{margin-right:auto!important}
+#ledgerMain .ledgerFooter span:has(#mCatCountFoot){margin-left:0!important}
+#ledgerMain .ledgerFooter span:has(#mTotalFoot){margin-left:0!important;order:4!important}
+#ledgerMain .ledgerFooter #mCountFoot{margin-left:0!important;order:3!important}
+#ledgerMain #mTotalFoot{white-space:nowrap!important}
+.toolsGrid{align-items:stretch!important}
+.toolsGrid>*{align-self:stretch!important;min-width:0!important;box-sizing:border-box!important}
+.toolsGrid .currentBookTool{display:flex!important;flex-direction:column!important;justify-content:center!important;gap:6px!important;min-height:40px!important;line-height:1.35!important}
+.toolsGrid .currentBookTool select{width:100%!important;height:40px!important;min-height:40px!important;box-sizing:border-box!important;margin:0!important}
+.toolsGrid .btn{display:flex!important;align-items:center!important;justify-content:center!important;min-height:40px!important;height:40px!important;box-sizing:border-box!important;margin:0!important;line-height:1.25!important}
+.categoryGroup{touch-action:pan-y!important}
+.categoryGroup.dragging{opacity:.72!important;transform:scale(.99)!important;box-shadow:0 8px 22px #0003!important;outline:2px solid var(--accent)!important;outline-offset:-2px!important;z-index:2!important}
+.categoryGroup.drag-over{outline:2px dashed var(--accent)!important;outline-offset:-3px!important;background:var(--surface-2)!important;transform:scale(1.008)!important}
+.categoryGroupHead .categoryDrag{pointer-events:none!important}
+@media(max-width:700px){#ledgerMain .mRecord .priceTop{gap:4px!important}#ledgerMain .mRecord .originalPriceLine{gap:3px!important}#ledgerMain .mRecord .priceMeta{font-size:8px!important}#ledgerMain .mRecord .itemTools{gap:1px!important}#ledgerMain .mRecord .itemTools button{font-size:8px!important;padding:1px!important}#ledgerMain .ledgerFooter{gap:6px!important}}
 </style></body></html>
