@@ -220,13 +220,13 @@ input,select,textarea,.btn,.modebtn,.custom-select-trigger,.custom-select-option
 #ledgerMain .mRecord{display:grid!important;grid-template-columns:20px minmax(0,1fr) minmax(115px,auto) auto!important;gap:7px!important;align-items:center!important;padding:9px 7px!important}
 #ledgerMain .mRecord>.itemDragHandle{grid-column:1!important;grid-row:1!important;justify-self:start!important;width:20px!important;min-width:20px!important;padding:2px 0!important;font-size:16px!important}
 #ledgerMain .mRecord>.recordInfo{grid-column:2!important;grid-row:1!important;display:flex!important;flex-direction:column!important;align-items:flex-start!important;justify-self:stretch!important;min-width:0!important;gap:4px!important}
-#ledgerMain .mRecord>.recordPrice{grid-column:3!important;grid-row:1!important;display:flex!important;flex-direction:column!important;align-items:flex-end!important;justify-self:stretch!important;min-width:0!important;gap:3px!important}
-#ledgerMain .mRecord>.itemTools{grid-column:4!important;grid-row:1!important;display:flex!important;justify-content:flex-end!important;align-items:center!important;align-self:center!important;gap:5px!important;margin:0!important;white-space:nowrap}
+#ledgerMain .mRecord>.recordPrice{grid-column:3!important;grid-row:1!important;display:flex!important;flex-direction:row!important;align-items:baseline!important;justify-content:flex-end!important;justify-self:stretch!important;min-width:0!important;gap:7px!important}
+#ledgerMain .mRecord>.itemTools{grid-column:4!important;grid-row:1!important;display:flex!important;justify-content:flex-end!important;align-items:center!important;align-self:center!important;gap:2px!important;margin:0!important;white-space:nowrap}
 #ledgerMain .mRecord .nameLine{display:flex;align-items:baseline;gap:5px;min-width:0;max-width:100%}
 #ledgerMain .mRecord .itemName{max-width:100%;min-width:0;text-align:left!important;overflow-wrap:anywhere}
 #ledgerMain .mRecord .quantityTag{font-size:11px;color:var(--text-2);white-space:nowrap}
 #ledgerMain .mRecord .recordMeta{width:100%;text-align:left!important;font-size:10px}
-#ledgerMain .mRecord .priceMeta{display:block!important;text-align:right!important;align-self:flex-end!important;font-size:10px!important;white-space:nowrap}
+#ledgerMain .mRecord .priceMeta{display:block!important;text-align:right!important;align-self:auto!important;font-size:10px!important;white-space:nowrap}
 #ledgerMain .mRecord .priceLine{display:flex;align-items:baseline;justify-content:flex-end;flex-wrap:wrap;gap:4px;white-space:normal}
 #ledgerMain .mRecord .itemTools button{height:auto!important;min-height:0!important;padding:1px 0!important;border:0!important;background:transparent!important;font-size:10px!important;line-height:1.4!important;color:var(--text-2)!important}
 #ledgerMain .mRecord .itemTools button+button{margin-left:0!important}
@@ -245,7 +245,7 @@ input,select,textarea,.btn,.modebtn,.custom-select-trigger,.custom-select-option
 #toolsMain .toolsGrid #generateTestBill{grid-column:2!important;grid-row:1!important}
 #toolsMain .toolsGrid #resetLocal{grid-column:3!important;grid-row:1!important}
 @media(max-width:700px){
- #ledgerMain .mRecord{grid-template-columns:18px minmax(0,1fr) minmax(92px,auto) auto!important;gap:5px!important;padding:8px 3px!important}
+ #ledgerMain .mRecord{grid-template-columns:18px minmax(0,1fr) minmax(132px,auto) auto!important;gap:5px!important;padding:8px 3px!important}
  #ledgerMain .mRecord>.itemDragHandle{grid-column:1!important;width:18px!important;min-width:18px!important}
  #ledgerMain .mRecord>.recordInfo{grid-column:2!important}
  #ledgerMain .mRecord>.recordPrice{grid-column:3!important}
@@ -259,9 +259,9 @@ input,select,textarea,.btn,.modebtn,.custom-select-trigger,.custom-select-option
  #toolsMain .toolsGrid .btn{font-size:10px;padding-left:5px;padding-right:5px;white-space:normal}
 }
 @media(max-width:390px){
- #ledgerMain .mRecord{grid-template-columns:17px minmax(0,1fr) minmax(78px,auto) auto!important;gap:3px!important}
+ #ledgerMain .mRecord{grid-template-columns:17px minmax(0,1fr) minmax(122px,auto) auto!important;gap:3px!important}
  #ledgerMain .mRecord>.itemDragHandle{width:17px!important;min-width:17px!important}
- #ledgerMain .mRecord .itemTools{flex-direction:column;align-items:flex-end;gap:1px!important}
+ #ledgerMain .mRecord .itemTools{flex-direction:row;align-items:center;gap:2px!important}
 }
 </style></head><body><div class="app">
 <header class="top"><nav class="modebar"><button class="modebtn active" id="ledgerTab">记账</button><button class="modebtn" id="viewerTab">账单展示</button><button class="modebtn" id="rankTab">排行</button><button class="modebtn" id="toolsTab">工具</button><button class="modebtn" id="themeToggle">☾ 夜间模式</button></nav></header>
