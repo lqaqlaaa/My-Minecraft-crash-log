@@ -140,10 +140,13 @@ body{min-height:100vh;height:auto;overflow-x:hidden;overflow-y:auto;}
 .bookMenuActions{border-top:1px solid var(--border);margin-top:5px;padding-top:5px;display:grid;grid-template-columns:1fr 1fr;gap:4px}
 .bookMenuActions button{background:var(--control);font-size:11px;text-align:center}
 .mRecord{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(130px,auto) 18px!important;gap:12px;align-items:center}
-.mRecord .recordPrice{grid-column:1;grid-row:1;align-items:flex-start;text-align:left;min-width:0}
-.mRecord .recordInfo{grid-column:2;grid-row:1;align-items:flex-end;text-align:right;min-width:0}.mRecord>.dragHandle{grid-column:3;grid-row:1;justify-self:end;align-self:center;cursor:grab;touch-action:none}
-.mRecord .itemName,.mRecord .recordMeta{text-align:right;width:100%}
-.mRecord .priceLine{justify-content:flex-start;flex-wrap:wrap;white-space:normal;gap:5px}
+.mRecord .recordInfo{grid-column:1;grid-row:1;align-items:flex-start;text-align:left;min-width:0;justify-self:stretch}
+.mRecord .recordPrice{grid-column:2;grid-row:1;align-items:flex-end;text-align:right;min-width:0;justify-self:stretch}
+.mRecord>.dragHandle{grid-column:3;grid-row:1;justify-self:end;align-self:center;cursor:grab;touch-action:none}
+.mRecord .itemName,.mRecord .recordMeta{text-align:left;width:100%}
+.mRecord .priceLine{justify-content:flex-end;flex-wrap:wrap;white-space:normal;gap:5px}
+.mRecord .priceMeta{text-align:right;width:100%}
+.mRecord .itemTools{justify-content:flex-end}
 .mRecord .priceLink{color:var(--accent)!important;font-weight:800}
 .mRecord .originalPrice{text-decoration:line-through!important;text-decoration-thickness:1.5px!important;color:var(--text-3)!important}
 .mRecord .netPrice{font:800 14px Georgia,serif;color:var(--accent);white-space:nowrap}
@@ -162,7 +165,7 @@ body{min-height:100vh;height:auto;overflow-x:hidden;overflow-y:auto;}
 .clockUnit input{width:48px;min-width:0;text-align:center}
 .dateTrigger{width:100%;min-height:36px;height:36px}
 input,select,textarea,.btn,.modebtn,.custom-select-trigger,.custom-select-option{transition:background-color 1s ease,color 1s ease,border-color 1s ease,box-shadow 1s ease!important}
-@media(max-width:560px){.mRecord{grid-template-columns:minmax(0,1fr) minmax(95px,42%) 18px!important;gap:7px}.mRecord .itemName{font-size:11px}.mRecord .recordMeta{font-size:9px}.mRecord .priceMeta{font-size:9px}.bookPickerTrigger{font-size:15px}.ledgerFooter{gap:7px}}
+@media(max-width:560px){.mRecord{grid-template-columns:minmax(0,1fr) minmax(95px,42%) 18px!important;gap:7px}.mRecord .recordInfo{grid-column:1;align-items:flex-start}.mRecord .recordPrice{grid-column:2;align-items:flex-end}.mRecord .itemName{font-size:11px}.mRecord .recordMeta{font-size:9px}.mRecord .priceMeta{font-size:9px}.bookPickerTrigger{font-size:15px}.ledgerFooter{gap:7px}}
 </style></head><body><div class="app">
 <header class="top"><nav class="modebar"><button class="modebtn active" id="ledgerTab">记账</button><button class="modebtn" id="viewerTab">账单展示</button><button class="modebtn" id="rankTab">排行</button><button class="modebtn" id="toolsTab">工具</button><button class="modebtn" id="themeToggle">☾ 夜间模式</button></nav></header>
 
