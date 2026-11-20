@@ -352,16 +352,16 @@ function render(){renderBookSelect();let rows=filtered(),total=rows.reduce((a,r)
   let item=e.target.closest('.mRecord'),group=e.target.closest('.categoryGroup'),categoryHandle=e.target.closest('.categoryDrag');
   if(item){
    drag={kind:'item',id:item.dataset.recordId,el:item,pointerId:e.pointerId,startX:e.clientX,startY:e.clientY,active:false,pointerType:e.pointerType};
-   if(e.pointerType==='touch'||e.pointerType==='pen')longPress=setTimeout(()=>{if(drag&&drag.pointerId===e.pointerId){drag.active=true;drag.el.classList.add('dragging');setTarget(drag.startX,drag.startY)}},230);
+   if(e.pointerType==='touch'||e.pointerType==='pen')longPress=setTimeout(()=>{longPress=null;if(drag&&drag.pointerId===e.pointerId){drag.active=true;drag.el.classList.add('dragging');setTarget(drag.startX,drag.startY)}},230);
    return;
   }
-  if(categoryHandle&&group&&(e.pointerType==='touch'||e.pointerType==='pen')){drag={kind:'category',category:group.dataset.category,el:group,pointerId:e.pointerId,startX:e.clientX,startY:e.clientY,active:false,pointerType:e.pointerType};longPress=setTimeout(()=>{if(drag&&drag.pointerId===e.pointerId){drag.active=true;drag.el.classList.add('dragging')}},230);return}
+  if(categoryHandle&&group&&(e.pointerType==='touch'||e.pointerType==='pen')){drag={kind:'category',category:group.dataset.category,el:group,pointerId:e.pointerId,startX:e.clientX,startY:e.clientY,active:false,pointerType:e.pointerType};longPress=setTimeout(()=>{longPress=null;if(drag&&drag.pointerId===e.pointerId){drag.active=true;drag.el.classList.add('dragging')}},230);return}
  },{passive:true});
  document.addEventListener('pointermove',e=>{
   if(!drag||e.pointerId!==drag.pointerId)return;
   let dx=e.clientX-drag.startX,dy=e.clientY-drag.startY,distance=Math.hypot(dx,dy);
   if(!drag.active){
-   if(drag.pointerType==='touch'||drag.pointerType==='pen'){if(distance>10&&!longPress){clear();return}if(!longPress&&distance>10){clear();return}}
+   if(drag.pointerType==='touch'||drag.pointerType==='pen'){if(distance>10&&longPress){clear();return}else if(distance>10&&!drag.active){clear();return}}
    else if(distance>5){drag.active=true;drag.el.classList.add('dragging')}
   }
   if(!drag.active)return;
@@ -638,4 +638,10 @@ document.addEventListener('click',e=>{if(!e.target.closest('.custom-select')&&!e
 #ledgerMain .mRecord .priceTop:empty{display:none!important}
 #ledgerMain .mRecord .priceTop:not(:has(.priceMeta)){display:none!important}
 #ledgerMain .mRecord .priceTop:has(.originalPriceLine):not(:has(.priceMeta)){gap:0!important}
+</style><style>
+/* 触屏整行长按拖动；普通滑动仍由页面滚动手势接管 */
+#ledgerMain .mRecord{touch-action:none!important}
+#ledgerMain .mRecord button{touch-action:manipulation!important}
+#ledgerMain .mRecord.dragging{will-change:transform,opacity,box-shadow}
+#ledgerMain .mRecord.drag-over{transition:transform .12s ease,background-color .12s ease,outline-color .12s ease!important}
 </style></body></html>
