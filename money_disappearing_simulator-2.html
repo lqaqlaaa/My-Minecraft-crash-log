@@ -620,7 +620,7 @@ document.addEventListener('click',e=>{if(!e.target.closest('.custom-select')&&!e
 #ledgerMain .mRecord .itemDragHandle{pointer-events:none!important;opacity:.45!important}
 #ledgerMain .mRecord .priceMeta{white-space:nowrap!important}
 #ledgerMain .mRecord .priceTop:empty{display:none!important}
-#ledgerMain .mRecord .priceTop:not(:has(.priceMeta)){display:none!important}
+#ledgerMain .mRecord .priceTop:not(:has(.priceMeta)){display:flex!important}
 #ledgerMain .mRecord .priceTop:has(.originalPriceLine):not(:has(.priceMeta)){gap:0!important}
 </style><style>
 /* 触屏整行长按拖动；普通滑动仍由页面滚动手势接管 */
@@ -795,5 +795,25 @@ document.addEventListener('click',e=>{if(!e.target.closest('.custom-select')&&!e
  #toolsMain .toolsGrid .btn{height:40px!important;min-height:40px!important;max-height:40px!important;padding:0 6px!important;font-size:11px!important}
  #toolsMain .toolsGrid #newBook{height:40px!important;min-height:40px!important}
 }
+
+/* 最终修正：单价在左；无单价时仅省略单价，不隐藏价格行 */
+#ledgerMain .mRecord .priceTop{display:flex!important;flex-direction:row!important;align-items:baseline!important;justify-content:flex-end!important;gap:6px!important;width:100%!important;white-space:nowrap!important}
+#ledgerMain .mRecord .priceTop:has(.originalPriceLine){display:flex!important}
+#ledgerMain .mRecord .priceTop>.priceMeta{order:0!important;display:inline-flex!important;flex:0 0 auto!important;align-self:baseline!important;margin:0!important;text-align:left!important;width:auto!important;white-space:nowrap!important}
+#ledgerMain .mRecord .priceTop>.originalPriceLine{order:1!important;display:inline-flex!important;flex:0 0 auto!important;white-space:nowrap!important}
+#toolsMain .toolsGrid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important;align-items:stretch!important}
+#toolsMain .toolsGrid>.btn{box-sizing:border-box!important;display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;min-width:0!important;height:42px!important;min-height:42px!important;max-height:42px!important;padding:0 8px!important;margin:0!important;line-height:1.2!important;font-size:12px!important;align-self:stretch!important}
+#toolsMain .toolsGrid>.currentBookTool{box-sizing:border-box!important;grid-column:1!important;grid-row:1!important;min-width:0!important}
+#toolsMain .toolsGrid>#newBook{grid-column:2!important;grid-row:1!important}
+#toolsMain .toolsGrid>#renameBook{grid-column:1!important;grid-row:2!important}
+#toolsMain .toolsGrid>#manageBooks{grid-column:2!important;grid-row:2!important}
+#toolsMain .toolsGrid>#mJson{grid-column:1!important;grid-row:3!important}
+#toolsMain .toolsGrid>#mCsv{grid-column:2!important;grid-row:3!important}
+#toolsMain .toolsGrid>#mImport{grid-column:1!important;grid-row:4!important}
+#toolsMain .toolsGrid>#manageCats{grid-column:2!important;grid-row:4!important}
+#toolsMain .toolsGrid>#manageUnits{grid-column:1!important;grid-row:5!important}
+#toolsMain .toolsGrid>#resetLocal{grid-column:2!important;grid-row:5!important}
+#toolsMain .toolsGrid>#generateTestBill{grid-column:1/-1!important;grid-row:6!important;width:100%!important}
+@media(max-width:700px){#toolsMain .toolsGrid>.btn{height:40px!important;min-height:40px!important;max-height:40px!important;font-size:11px!important;padding:0 5px!important}}
 </style>
 </body></html>
